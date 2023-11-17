@@ -2,12 +2,10 @@ Feature: Subscribe
 In order to get notified about the public holidays beforehand, x days
 I would like to be able to Subscribe by selecting one more countries as well unsubscribe to them.
 
-
 Scenario: View subscriptions
    Given I have some subscriptions
    When I view my subscriptions
    Then my subscriptions should visible
-
 
 Scenario: Subscribe when not authenticated
     Given I am not authenticated
