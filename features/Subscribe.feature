@@ -25,11 +25,7 @@ Scenario: Unsubscribe
 
 Scenario: Send mail
     Given I am subscribed to a country
-    When there is vacation within X days
-    Then an email should be sent about the vacation
-
-
-
-
-  
- 
+    And there is vacation within a subscribed country within 7 days
+    And If I haven't received a notification for that vacation
+    When the mail sending time comes
+    Then an email should be sent about the vacation for that country
