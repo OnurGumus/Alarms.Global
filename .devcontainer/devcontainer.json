@@ -1,0 +1,63 @@
+{
+	"name": "HolidayTracker",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/dotnet:8.0",
+	
+	"features": {
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/devcontainers/features/powershell:1": {}
+	},
+    	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [5070, 5071],
+	"portsAttributes": {
+			"5071": {
+				"protocol": "https"
+			}
+	},
+    "containerEnv": {
+		// uncomment the below two lines once you have certificate
+		// "ASPNETCORE_Kestrel__Certificates__Default__Password": "crypticpassword",
+		// "ASPNETCORE_Kestrel__Certificates__Default__Path": "/home/vscode/.aspnet/https/aspnetapp.pfx",
+		"ASPNETCORE_ENVIRONMENT":"Development",
+		//Use the following line instead once you have certificate
+		"ASPNETCORE_URLS":"http://+:5070"
+	
+	},
+    // 3. Do one of the following depending on your scenario:
+ //    * When using GitHub Codespaces and/or Remote - Containers:
+ //      1. Start the container
+ //      2. Drag ~/.aspnet/https/aspnetapp.pfx into the root of the file explorer
+ //      3. Open a terminal in VS Code and run "mkdir -p /home/vscode/.aspnet/https && mv aspnetapp.pfx /home/vscode/.aspnet/https"
+ //
+ //    * If only using Remote - Containers with a local container, uncomment this line instead:
+	"mounts": [ 
+		// uncomment the next line for cert
+		// "source=${env:HOME}${env:USERPROFILE}/.aspnet/https,target=/home/vscode/.aspnet/https,type=bind",
+		// "source=${env:HOME}${env:USERPROFILE}/.microsoft/usersecrets,target=/root/.microsoft/usersecrets,type=bind",
+		// "source=${env:HOME}${env:USERPROFILE}/.aspnet/DataProtection-Keys,target=/root/.aspnet/DataProtection-Keys,type=bind"
+	 ],
+     "customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {	
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"ms-dotnettools.csharp",
+				"ionide.ionide-fsharp",
+				"ionide.mechanic",
+				"alfonsogarciacaro.vscode-template-fsharp-highlight",
+				"alexkrechik.cucumberautocomplete",
+				"bierner.lit-html",
+				"ionide.ionide-paket",
+				"ionide.ionide-fake",
+				"BRBoer.vsc-conceal",
+				"fernandoescolar.vscode-solution-explorer",
+			]
+		}
+	},
+    //"postCreateCommand": "./postbuild.sh",
+    "remoteUser": "root"
+}
