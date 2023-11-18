@@ -11,7 +11,7 @@ nuget Microsoft.Playwright
 nuget Fable.Remoting.Giraffe
 nuget Serilog.Sinks.ApplicationInsights
 nuget Serilog.Sinks.Console
-nuget Destructurama.FSharp
+nuget Destructurama.FSharp 1.2.0
 nuget Serilog.Sinks.File
 nuget Thoth.Json.Net
 nuget FSharp.Interop.Dynamic
