@@ -1,1 +1,8 @@
+bin/
+obj/
+node_modules/
+*.cached
+deploy/
 .DS_Store
+screenshot.*
+.fake

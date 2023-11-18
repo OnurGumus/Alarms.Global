@@ -1,0 +1,35 @@
+source https://api.nuget.org/v3/index.json
+
+storage: none
+framework:auto-detect
+
+nuget Giraffe
+nuget FSharp.Core
+nuget Microsoft.AspNetCore.SpaServices.Extensions
+nuget TickSpec
+nuget Microsoft.Playwright
+nuget Fable.Remoting.Giraffe
+nuget Serilog.Sinks.ApplicationInsights
+nuget Serilog.Sinks.Console
+nuget Destructurama.FSharp
+nuget Serilog.Sinks.File
+nuget Thoth.Json.Net
+nuget FSharp.Interop.Dynamic
+nuget Microsoft.Extensions.Configuration
+nuget Hocon.Extensions.Configuration
+nuget Serilog
+nuget Serilog.Sinks.Async
+nuget Giraffe.SerilogExtensions
+nuget FsToolkit.ErrorHandling
+nuget FsConfig
+nuget Akka.Logger.Serilog
+nuget Akka.Persistence.Query.Sql
+nuget Serilog.Expressions
+nuget Serilog.AspNetCore
+nuget SQLitePCLRaw.bundle_green
+nuget ExcelProvider
+nuget Serilog.Sinks.Seq
+nuget Microsoft.ApplicationInsights.AspNetCore
+nuget ThrottlingTroll
+nuget Google.Apis.Auth
+nuget Thoth.Json
