@@ -1,6 +1,5 @@
 Feature: Authentication
 
-
 Scenario: Sign In with non OAUTH Email
  Given I am not Sign In
   When I an provide a valid email
