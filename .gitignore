@@ -6,3 +6,5 @@ deploy/
 .DS_Store
 screenshot.*
 .fake
+.vscode/settings.json
+logs/

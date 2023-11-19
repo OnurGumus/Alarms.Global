@@ -1,12 +1,26 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="WebRoot/" />
+    <Compile Include="Views/Common.fs" />
+    <Compile Include="Views/Index.fs" />
+    <Compile Include="Views/Layout.fs" />
+    <Compile Include="Handlers/Default.fs" />
+    <Compile Include="HTTP.fs" />
+    <Compile Include="Serilog.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-    
+  <ItemGroup>
+    <None Include="web.config" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="WebRoot/**/*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="./config.hocon">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
