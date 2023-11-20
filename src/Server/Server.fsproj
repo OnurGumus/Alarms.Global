@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="WebRoot/" />
@@ -9,6 +10,7 @@
     <Compile Include="Views/Index.fs" />
     <Compile Include="Views/Layout.fs" />
     <Compile Include="Handlers/Default.fs" />
+    <Compile Include="Environments.fs" />
     <Compile Include="HTTP.fs" />
     <Compile Include="Serilog.fs" />
     <Compile Include="Program.fs" />
@@ -21,6 +23,10 @@
     <Content Include="./config.hocon">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.fsproj" />
+    <ProjectReference Include="..\ServerInterfaces\ServerInterfaces.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
