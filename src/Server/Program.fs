@@ -39,7 +39,7 @@ let errorHandler (ex: Exception) (ctx: HttpContext) =
 let configureCors (builder: CorsPolicyBuilder) =
 #if DEBUG
     builder
-        .WithOrigins("http://localhost:8000", "https://localhost:8001")
+        .WithOrigins("http://localhost:5070", "https://localhost:5071")
         .AllowAnyMethod()
         .AllowAnyHeader()
     |> ignore
