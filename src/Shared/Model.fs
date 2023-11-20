@@ -33,6 +33,7 @@ type Predicate =
 
 type Version =
     | Version of int64
+
     member this.Value: int64 = let (Version v) = this in v
     member this.Zero = Version 0L
 
@@ -73,3 +74,19 @@ type LongString =
         s.Value |> LongString.TryCreate |> forceValidate
 
     override this.ToString() = this.Value
+
+
+type CountryId =
+    | CountryId of ShortString
+
+    member this.Value = let (CountryId orderId) = this in orderId
+
+    static member CreateNew() =
+        "Country_" + Guid.NewGuid().ToString()
+        |> ShortString.TryCreate
+        |> forceValidate
+        |> CountryId
+
+type Country =
+    { CountryId: CountryId
+      Name: ShortString }
