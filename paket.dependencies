@@ -33,3 +33,13 @@ nuget Microsoft.ApplicationInsights.AspNetCore
 nuget ThrottlingTroll
 nuget Google.Apis.Auth
 nuget Thoth.Json
+
+
+group Build
+    source https://api.nuget.org/v3/index.json
+    framework: auto-detect
+    storage: none
+
+    nuget FSharp.Core
+    nuget Fake.Core.Target
+    nuget Fake.DotNet.Cli
