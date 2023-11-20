@@ -58,6 +58,6 @@
 			]
 		}
 	},
-    //"postCreateCommand": "./postbuild.sh",
+    "postCreateCommand": "./postbuild.sh",
     "remoteUser": "root"
 }
