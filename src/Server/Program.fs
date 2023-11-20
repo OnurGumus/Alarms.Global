@@ -147,8 +147,7 @@ let main args =
 
     let mutable ret = 0
 
-    let appEnv = new obj ()
-
+    let appEnv = new Environments.AppEnv(config)
     try
         try
             (host appEnv args).Run()
