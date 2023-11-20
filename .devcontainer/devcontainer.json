@@ -45,8 +45,9 @@
 		"vscode": {	
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
+				"ms-dotnettools.vscode-dotnet-runtime",
 				"ms-dotnettools.csharp",
-				"ionide.ionide-fsharp",
+				"Ionide.Ionide-fsharp",
 				"ionide.mechanic",
 				"alfonsogarciacaro.vscode-template-fsharp-highlight",
 				"alexkrechik.cucumberautocomplete",
