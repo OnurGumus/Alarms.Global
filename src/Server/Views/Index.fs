@@ -14,7 +14,9 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
 
         let countryNames =
             countries
-            |> List.map (fun country -> html $"""<li>{country.Name.Value}</li>""")
+            |> List.map (fun country -> 
+
+                html $"""<li><sl-switch>{country.Name.Value}</sl-switch></li>""")
             |> String.concat Environment.NewLine
 
         return
