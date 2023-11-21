@@ -6,24 +6,28 @@ open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.StaticFiles
 
-let srciptSrcElem =
+let scriptSrcElem =
     [|
         """data:"""
         """'nonce-110888888'"""
         """https://cdnjs.cloudflare.com/ajax/libs/dompurify/"""
+        """https://cdn.jsdelivr.net/npm/@shoelace-style/"""
     |]
     |> String.concat " "
 
 let styleSrcWithHashes = [| """'nonce-110888888'""" |] |> String.concat " "
 
 let styleSrc =
-    [| """https://unpkg.com/open-props@1.5.9/open-props.min.css""" |]
+    [| 
+        """https://unpkg.com/open-props@1.5.9/open-props.min.css"""
+        """https://cdn.jsdelivr.net/npm/@shoelace-style/"""
+    |]
     |> String.concat " "
 
 let styleSrcElem =
     [|
         """https://unpkg.com/open-props@1.5.9/open-props.min.css"""
-
+        """https://cdn.jsdelivr.net/npm/@shoelace-style/"""
     |]
     |> String.concat " "
 
@@ -44,7 +48,7 @@ let headerMiddleware =
             font-src 'self';\
             img-src 'self';\
             manifest-src 'self';\
-            script-src-elem 'self' {srciptSrcElem} ;\
+            script-src-elem 'self' {scriptSrcElem} ;\
             connect-src 'self' localhost ws://192.168.50.236:* ws://localhost:* http://localhost:*/dist/ https://localhost:*/dist/;\
             style-src 'self' 'unsafe-hashes' {styleSrc} ;\
             style-src-elem 'self' {styleSrcElem} ;\
@@ -53,7 +57,7 @@ let headerMiddleware =
             script-src  'wasm-unsafe-eval';\
             frame-src 'self';\
             require-trusted-types-for 'script';\
-            trusted-types *;\
+            trusted-types * 'allow-duplicates';\
             "
             )
         | _ -> ()

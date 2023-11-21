@@ -4,3 +4,10 @@ text,
 appearance,
 other,
 animation;
+
+
+@layer appearance {
+    li{
+        list-style-type: none
+    }
+}
