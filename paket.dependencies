@@ -33,7 +33,8 @@ nuget Microsoft.ApplicationInsights.AspNetCore
 nuget ThrottlingTroll
 nuget Google.Apis.Auth
 nuget Thoth.Json
-
+nuget TickSpec
+nuget Microsoft.Playwright
 
 group Build
     source https://api.nuget.org/v3/index.json

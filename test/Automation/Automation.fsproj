@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Setup.fs" />
+    <Compile Include="Program.fs" />
+    <EmbeddedResource Include="../../features/Subscribe.feature" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Server\Server.fsproj" />
+    <ProjectReference Include="..\..\src\Shared\Shared.fsproj" />
+    <ProjectReference Include="..\..\src\ServerInterfaces\ServerInterfaces.fsproj" />
+    <Content Include="./test-config.hocon">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>
