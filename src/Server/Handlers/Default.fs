@@ -16,8 +16,6 @@ let webApp (env: _) (layout: HttpContext -> (int -> Task<string>) -> string Task
             }
 
     let defaultRoute = viewRoute (Index.view env)
-
-
     choose [ routeCi "/" >=> defaultRoute ]
 
 let webAppWrapper (env: _) (layout: HttpContext -> (int -> Task<string>) -> string Task) =
