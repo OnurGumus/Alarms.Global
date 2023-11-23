@@ -1,0 +1,50 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        },
+        {
+            "name": "Launch Web",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build Server",
+            "program": "${workspaceFolder}/src/Server/bin/Debug/net8.0/Server.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Server",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "justMyCode": true,
+            "logging": {
+                "moduleLoad": false
+            }
+            // "symbolOptions": {
+            //     "searchMicrosoftSymbolServer": true,
+            //     "searchNuGetOrgSymbolServer": true
+            // },
+            // "suppressJITOptimizations": true,
+            // "env": {
+            //     "COMPlus_ZapDisable": "1",
+            //     "COMPlus_ReadyToRun": "0"
+            // }
+        },
+        {
+            "name": "Debug Test",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build Test",
+            "program": "${workspaceFolder}/test/Automation/bin/Debug/net8.0/Automation.dll",
+            "args": [],
+            "justMyCode" : true,
+            "logging": {
+                "moduleLoad": false
+            },
+            "stopAtEntry": false,
+            "console": "internalConsole",
+        },
+    ]
+    
+}
