@@ -16,7 +16,13 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
             countries
             |> List.map (fun country -> 
 
-                html $"""<li><sl-switch>{country.Name.Value}</sl-switch></li>""")
+                html $"""
+                <li>
+                    <label class="gui-switch">
+                        {country.Name.Value}
+                        <input is="gui-switch" type="checkbox" role="switch">
+                    </label>
+                </li>""")
             |> String.concat Environment.NewLine
 
         return

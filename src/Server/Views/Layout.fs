@@ -73,8 +73,6 @@ let view (ctx: HttpContext) (env: _) (isDev) (body: int -> Task<string>) =
             <!-- Imports the manifest to represent the web application. A web app must have a manifest to be a PWA. -->
             <link rel="manifest" href="/manifest.webmanifest" />
             <link rel="stylesheet" href="/css/index.css?v=202307101701"/>
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/themes/light.css" />
-            <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.11.2/cdn/shoelace-autoloader.js"></script>
 
             <script defer crossorigin="anonymous" type="text/javascript" 
             src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.1/purify.min.js"></script>
