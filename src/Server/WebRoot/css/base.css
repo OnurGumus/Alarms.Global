@@ -1,11 +1,12 @@
-@import "https://unpkg.com/open-props";
-@import "https://unpkg.com/open-props/normalize.min.css";
-@import "https://unpkg.com/open-props/buttons.min.css";
-@layer layout,
+@layer 
+open-props,
+layout,
 text,
 appearance,
 other,
 animation;
+
+@import "open-props.css?v=202311160805" layer(open-props);
 
 @layer layout {
   .gui-switch {
@@ -19,6 +20,7 @@ animation;
     justify-content: space-between;
     & > input {
       --thumb-position: 0%;
+      margin:revert;
       padding: var(--track-padding);
       inline-size: var(--track-size);
       block-size: var(--thumb-size);
@@ -81,7 +83,7 @@ animation;
     -ms-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    & > input {
+    > input {
       background: var(--track-color-inactive);
       -webkit-appearance: none;
       -moz-appearance: none;
