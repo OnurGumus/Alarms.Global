@@ -28,10 +28,13 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
         return
             html
                 $""" 
-            <h{dataLevel + 1}> Alarms Global </h{dataLevel + 1}>
-            <h{dataLevel + 2}> Countries </h{dataLevel + 2}>
-            <ul>
-                {countryNames}
-            </ul>
+            <button type=button> Sign In</button>
+            <h{dataLevel + 1}> Countries </h{dataLevel + 1}>
+            <fieldset>
+                <legend> Choose countries to subscribe </legend>
+                <ul>
+                    {countryNames}
+                </ul>
+            </fieldset>
         """
     }

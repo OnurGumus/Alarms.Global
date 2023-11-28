@@ -40,7 +40,7 @@ let view (ctx: HttpContext) (env: _) (isDev) (body: int -> Task<string>) =
 
                 String.Join("\r\n", scripts)
 
-        let! body = body 0
+        let! body = body 1
 
         return
             html
@@ -83,7 +83,7 @@ let view (ctx: HttpContext) (env: _) (isDev) (body: int -> Task<string>) =
        
         <body>
             <header>
-              
+                <h1> Alarms Global </h1>
             </header>
             <main>
                 {body}
