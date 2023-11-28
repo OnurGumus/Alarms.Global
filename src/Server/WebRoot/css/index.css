@@ -7,6 +7,13 @@ animation;
 
 @import "base.css?v=202311160805" layer(base);
 
+@layer layout {
+    body{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
 @layer appearance {
     li{
         list-style-type: none
