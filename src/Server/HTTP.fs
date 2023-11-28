@@ -11,7 +11,6 @@ let scriptSrcElem =
         """data:"""
         """'nonce-110888888'"""
         """https://cdnjs.cloudflare.com/ajax/libs/dompurify/"""
-        """https://cdn.jsdelivr.net/npm/@shoelace-style/"""
     |]
     |> String.concat " "
 
@@ -19,15 +18,13 @@ let styleSrcWithHashes = [| """'nonce-110888888'""" |] |> String.concat " "
 
 let styleSrc =
     [| 
-        """https://unpkg.com/open-props@1.5.9/open-props.min.css"""
-        """https://cdn.jsdelivr.net/npm/@shoelace-style/"""
+        """https://unpkg.com/open-props@1.6.13/"""
     |]
     |> String.concat " "
 
 let styleSrcElem =
     [|
-        """https://unpkg.com/open-props@1.5.9/open-props.min.css"""
-        """https://cdn.jsdelivr.net/npm/@shoelace-style/"""
+        """https://unpkg.com/open-props@1.6.13/"""
     |]
     |> String.concat " "
 
