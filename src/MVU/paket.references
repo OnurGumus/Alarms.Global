@@ -1,5 +1,2 @@
 group Client
 FSharp.Core
-Elmish
-Fable.Store
-FSharp.Control.AsyncRx
