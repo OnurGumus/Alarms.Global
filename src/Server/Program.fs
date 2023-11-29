@@ -78,11 +78,11 @@ let configureApp (app: IApplicationBuilder, appEnv) =
         .UseGiraffe(handler)
 
     if env.IsDevelopment() then
-        // app.UseSpa(fun spa ->
-        //     let path = System.IO.Path.Combine(__SOURCE_DIRECTORY__, "../../.")
-        //     spa.Options.SourcePath <- path
-        //     spa.Options.DevServerPort <- 5173
-        //     spa.UseReactDevelopmentServer(npmScript = "watch"))
+        app.UseSpa(fun spa ->
+            let path = System.IO.Path.Combine(__SOURCE_DIRECTORY__, "../../.")
+            spa.Options.SourcePath <- path
+            spa.Options.DevServerPort <- 5173
+            spa.UseReactDevelopmentServer(npmScript = "watch"))
 
         app.UseSerilogRequestLogging() |> ignore
 
