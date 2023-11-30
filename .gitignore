@@ -48,3 +48,5 @@ bld/
 _NCrunch_*
 .*crunch*.local.xml
 nCrunchTemp_*
+
+src/Server/WebRoot/dist/
