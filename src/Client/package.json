@@ -11,8 +11,7 @@
   },
   "dependencies": {
     "@lit-labs/motion": "latest",
-    "lit": "latest",
-    "socketcluster-client": "^5.5.2"
+    "lit": "latest"
   },
   "devDependencies": {
     "@types/node": "latest",
