@@ -4,6 +4,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CountriesSelector.fs" />
     <Compile Include="App.fs" />
   </ItemGroup>
   <ItemGroup>

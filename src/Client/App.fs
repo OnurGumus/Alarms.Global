@@ -6,6 +6,7 @@ open Lit.Elmish
 open Browser
 open Elmish.UrlParser
 open Elmish.Navigation
+open HolidayTracker.Client
 
-printf "Client started"
+CountriesSelector.register()
 let doNothing () = ()

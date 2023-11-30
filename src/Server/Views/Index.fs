@@ -20,7 +20,10 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
                 <li>
                     <label class="gui-switch">
                         {country.Name.Value}
-                        <input is="gui-switch" type="checkbox" role="switch">
+                        <input is="gui-switch"
+                            data-id={country.CountryId.Value}
+                            data-name={country.Name.Value}
+                            class="country-selector" type="checkbox" role="switch">
                     </label>
                 </li>""")
             |> String.concat Environment.NewLine
@@ -29,12 +32,14 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
             html
                 $""" 
             <button type=button> Sign In</button>
-            <h{dataLevel + 1}> Countries </h{dataLevel + 1}>
-            <fieldset>
-                <legend> Choose countries to subscribe </legend>
-                <ul>
-                    {countryNames}
-                </ul>
-            </fieldset>
+            <ht-countries-selector>
+                <h{dataLevel + 1}> Countries </h{dataLevel + 1}>
+                <fieldset>
+                    <legend> Choose countries to subscribe </legend>
+                    <ul>
+                        {countryNames}
+                    </ul>
+                </fieldset>
+            </ht-countries-selector>
         """
     }
