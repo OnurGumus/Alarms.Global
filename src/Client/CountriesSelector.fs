@@ -15,20 +15,22 @@ open FsToolkit.ErrorHandling
 open HolidayTracker.MVU
 open Thoth.Json
 open HolidayTracker.Shared
+open CountriesSelector
+open ElmishSideEffect
 
 let private hmr = HMR.createToken ()
 
-[<LitElement("ht-countries-selector")>]
-let LitElement () =
-    Hook.useHmr (hmr)
+let rec execute (host: HTMLElement) sideEffect (dispatch: Msg -> unit) =
+    match sideEffect with
+    | SideEffect.NoEffect -> ()
 
-    let (host: HTMLElement), _ =
-        !! LitElement.init (fun (config: LitConfig<_>) -> config.useShadowDom <- false)
-
+[<HookComponent>]
+let view (host: HTMLElement) (model: Model) dispatch =
     Hook.useEffectOnce (fun () ->
         let onClick (e: Event) =
-            e.preventDefault ()
-            window.alert (e.target?getAttribute ("data-name"))
+            if model.IsLoggedIn |> not then
+                e.preventDefault ()
+                window.alert (e.target?getAttribute ("data-name"))
 
         let countrySelectors: seq<HTMLElement> =
             !! host.querySelectorAll(".country-selector")
@@ -39,5 +41,22 @@ let LitElement () =
         Hook.createDisposable (fun () ->
             countrySelectors
             |> Seq.iter (fun (s: HTMLElement) -> s.removeEventListener ("click", onClick))))
+
+    Lit.nothing
+
+[<LitElement("ht-countries-selector")>]
+let LitElement () =
+    Hook.useHmr (hmr)
+
+    let (host: HTMLElement), _ =
+        !! LitElement.init (fun (config: LitConfig<_>) -> config.useShadowDom <- false)
+
+    let program =
+        Program.mkHiddenProgramWithSideEffectExecute (init false) (update) (execute host)
+        |> Program.withDebugger
+        |> Program.withConsoleTrace
+
+    let model, dispatch = Hook.useElmish program
+    view host model dispatch
 
 let register () = ()
