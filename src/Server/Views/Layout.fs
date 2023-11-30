@@ -88,6 +88,9 @@ let view (ctx: HttpContext) (env: _) (isDev) (body: int -> Task<string>) =
             <main>
                 {body}
             </main>
+            <footer>
+                <a href="/privacy">Privacy Policy</a>
+            </footer>
         </body>
     </html>"""
     }

@@ -9,6 +9,7 @@
     <Compile Include="Views/Common.fs" />
     <Compile Include="Views/Index.fs" />
     <Compile Include="Views/Layout.fs" />
+    <Compile Include="Views/Privacy.fs" />
     <Compile Include="Handlers/Default.fs" />
     <Compile Include="Environments.fs" />
     <Compile Include="HTTP.fs" />
