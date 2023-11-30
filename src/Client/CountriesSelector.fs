@@ -22,7 +22,10 @@ let private hmr = HMR.createToken ()
 
 let rec execute (host: HTMLElement) sideEffect (dispatch: Msg -> unit) =
     match sideEffect with
-    | SideEffect.NoEffect -> ()
+    | NoEffect -> ()
+    | SubscribeToLogin ->
+        LoginStore.store.Subscribe (fun (model:LoginStore.Model) -> dispatch (SetLoggedIn <| model.UserClientId.IsSome))  
+        |> ignore
 
 [<HookComponent>]
 let view (host: HTMLElement) (model: Model) dispatch =
