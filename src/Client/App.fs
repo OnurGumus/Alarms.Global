@@ -8,5 +8,5 @@ open Elmish.UrlParser
 open Elmish.Navigation
 open HolidayTracker.Client
 
-CountriesSelector.register()
-let doNothing () = ()
+CountriesSelector.register ()
+SignIn.register ()

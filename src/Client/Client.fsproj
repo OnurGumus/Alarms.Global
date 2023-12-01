@@ -6,6 +6,7 @@
   <ItemGroup>
     <Compile Include="ElmishSideEffect.fs" />
     <Compile Include="LoginStore.fs" />
+    <Compile Include="SignIn.fs" />
     <Compile Include="CountriesSelector.fs" />
     <Compile Include="App.fs" />
   </ItemGroup>

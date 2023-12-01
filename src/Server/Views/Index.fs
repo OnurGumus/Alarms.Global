@@ -7,7 +7,7 @@ open HolidayTracker.ServerInterfaces.Query
 open HolidayTracker.Shared.Model
 open System
 
-let view (env: _) (ctx: HttpContext) (dataLevel: int) =
+let view (env: _) (_: HttpContext) (dataLevel: int) =
     task {
         let query = env :> IQuery
         let! countries = query.Query<Country>()
@@ -31,11 +31,11 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
         return
             html
                 $""" 
-            <button type=button> Sign In</button>
+            <ht-signin></ht-signin>
             <ht-countries-selector>
                 <h{dataLevel + 1}> Countries </h{dataLevel + 1}>
                 <fieldset>
-                    <legend> Choose countries to subscribe </legend>
+                    <legend>Choose countries to subscribe</legend>
                     <ul>
                         {countryNames}
                     </ul>

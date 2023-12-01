@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="LoginStore.fs" />
+    <Compile Include="SignIn.fs" />
     <Compile Include="CountriesSelector.fs" />
     <Compile Include="App.fs" />
     <Content Include="paket.references" />

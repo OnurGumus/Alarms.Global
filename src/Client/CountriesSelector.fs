@@ -24,7 +24,7 @@ let rec execute (host: HTMLElement) sideEffect (dispatch: Msg -> unit) =
     match sideEffect with
     | NoEffect -> ()
     | SubscribeToLogin ->
-        LoginStore.store.Subscribe (fun (model:LoginStore.Model) -> dispatch (SetLoggedIn <| model.UserClientId.IsSome))  
+        LoginStore.store.Subscribe(fun (model: LoginStore.Model) -> dispatch (SetLoggedIn <| model.UserClientId.IsSome))
         |> ignore
 
 [<HookComponent>]
@@ -33,7 +33,15 @@ let view (host: HTMLElement) (model: Model) dispatch =
         let onClick (e: Event) =
             if model.IsLoggedIn |> not then
                 e.preventDefault ()
-                window.alert (e.target?getAttribute ("data-name"))
+
+                (host :?> LitElement)
+                    .dispatchCustomEvent (
+                        Constants.Events.LOGIN_REQUESTED,
+                        (e.target?getAttribute ("data-name")),
+                        true,
+                        true,
+                        true
+                    )
 
         let countrySelectors: seq<HTMLElement> =
             !! host.querySelectorAll(".country-selector")
