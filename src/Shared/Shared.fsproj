@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Fable.Validation.fs" />
+    <Compile Include="Constants.fs" />
     <Compile Include="Model.fs" />
     <Content Include="paket.references" />
   </ItemGroup>
