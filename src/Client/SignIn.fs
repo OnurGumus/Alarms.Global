@@ -102,20 +102,37 @@ let view (host: LitElement) (model: Model) dispatch =
     | NotLoggedIn ->
         html
             $"""
-            <button type=button @click={Ev(fun _ -> dispatch LoginRequested)}> Sign In</button>
+            <button type=button @click={Ev(fun _ -> dispatch LoginRequested)}>Sign In</button>
         """
     | AskVerification
     | AskEmail ->
         html
             $"""
-            <dialog {Lit.refValue dialogRef}>
-            <button type=button class="close deny" @click={Ev(fun _ -> dispatch LoginCancelled)}>
-                <img src="/assets/icons/icons8-close.svg" alt='close button'>
-            </button>
-            <h2> Sign in or Sign up </h2>
-
-             <div> dialog </div>
-        </dialog>
+            <dialog id="opdialog" {Lit.refValue dialogRef}> 
+                <form method="dialog" >
+                    <header> 
+                        <h2>Sign in</h2>
+                        <button type="button" @click={Ev(fun _ -> dispatch LoginCancelled)} title="Close dialog"> 
+                            <title>Close dialog icon</title>
+                            <svg width="24" height="24" viewBox="0 0 24 24">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </header>
+                    <article>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nesciunt alias. Tenetur, eos reiciendis deserunt possimus sit minus earum aspernatur?</p>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nesciunt alias. Tenetur, eos reiciendis deserunt possimus sit minus earum aspernatur?</p>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nesciunt alias. Tenetur, eos reiciendis deserunt possimus sit minus earum aspernatur?</p>
+                    </article>
+                    <footer>
+                        <menu>
+                            <button type="reset" @click={Ev(fun _ -> dispatch LoginCancelled)}>Cancel</button>
+                            <button type="submit" value="confirm">Confirm</button>
+                        </menu>
+                    </footer>
+                </form>
+            </dialog>
         """
 
 [<LitElement("ht-signin")>]
