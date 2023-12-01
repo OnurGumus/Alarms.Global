@@ -76,17 +76,22 @@ let view (ctx: HttpContext) (env: _) (isDev) (body: int -> Task<string>) =
 
             <script defer crossorigin="anonymous" type="text/javascript" 
             src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.1/purify.min.js"></script>
+            <script nonce="110888888" src="https://accounts.google.com/gsi/client" async></script>
             <script defer src="/index.js"></script>
             {script}
 
         </head>
-       
         <body>
             <header>
                 <h1> Alarms Global </h1>
             </header>
             <main>
                 {body}
+                <!-- Below is not used but required otherwise dynamic google sigin button won't appear-->
+                <div 
+                    class="hidden"
+                    id="g_id_onload"
+                    data-client_id="961379412830-oe2516pvftiv91i2hga07u4n96vtu1lr.apps.googleusercontent.com"></div>
             </main>
             <footer>
                 <a href="/privacy">Privacy Policy</a>

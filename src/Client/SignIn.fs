@@ -28,6 +28,8 @@ let rec execute (host: LitElement) order dispatch =
     | ShowError ex -> window.alert ex
 
     | _ -> ()
+[<Global>]
+let google:obj = jsNative
 
 [<HookComponent>]
 let view (host: LitElement) (model: Model) dispatch =
@@ -59,6 +61,9 @@ let view (host: LitElement) (model: Model) dispatch =
 
                     dialog.showModal ()
                     dialog.removeAttribute("hidden")
+                    let googleSignin = document.getElementById("g_id_onload2")
+                    googleSignin?style?width <- "208px"
+                    google?accounts?id?renderButton( googleSignin,{|  |})
             | _ -> ()
     )
 
@@ -121,7 +126,25 @@ let view (host: LitElement) (model: Model) dispatch =
                             </svg>
                         </button>
                     </header>
+
                     <article>
+                    <div>
+                        <div id="g_id_onload2"
+                                data-client_id="961379412830-oe2516pvftiv91i2hga07u4n96vtu1lr.apps.googleusercontent.com"
+                                data-context="signin"
+                                data-ux_mode="popup"
+                                data-login_uri="http://localhost:5070/signin-google"
+                                data-auto_prompt="false"></div>
+
+                        <div class="g_id_signin"
+                            data-type="standard"
+                            data-shape="rectangular"
+                            data-theme="outline"
+                            data-text="signin_with"
+                            data-size="small"
+                            data-logo_alignment="left">
+                        </div>
+                    </div>
                         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nesciunt alias. Tenetur, eos reiciendis deserunt possimus sit minus earum aspernatur?</p>
                         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nesciunt alias. Tenetur, eos reiciendis deserunt possimus sit minus earum aspernatur?</p>
                     </article>
