@@ -9,6 +9,9 @@ animation;
 @import "open-props.css?v=202311160805" layer(open-props);
 
 @layer layout {
+  .hidden{
+    display:none;
+  }
   html:has(dialog[open]) {
     overflow: hidden;
   }
