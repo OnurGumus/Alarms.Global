@@ -58,6 +58,7 @@ let view (host: LitElement) (model: Model) dispatch =
                     )
 
                     dialog.showModal ()
+                    dialog.removeAttribute("hidden")
             | _ -> ()
     )
 
@@ -108,7 +109,7 @@ let view (host: LitElement) (model: Model) dispatch =
     | AskEmail ->
         html
             $"""
-            <dialog id="opdialog" {Lit.refValue dialogRef}> 
+            <dialog hidden {Lit.refValue dialogRef}> 
                 <form method="dialog" >
                     <header> 
                         <h2>Sign in</h2>
@@ -121,7 +122,6 @@ let view (host: LitElement) (model: Model) dispatch =
                         </button>
                     </header>
                     <article>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nesciunt alias. Tenetur, eos reiciendis deserunt possimus sit minus earum aspernatur?</p>
                         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nesciunt alias. Tenetur, eos reiciendis deserunt possimus sit minus earum aspernatur?</p>
                         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nesciunt alias. Tenetur, eos reiciendis deserunt possimus sit minus earum aspernatur?</p>
                     </article>
