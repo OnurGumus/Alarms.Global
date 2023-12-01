@@ -11,7 +11,8 @@ let scriptSrcElem =
         """data:"""
         """'nonce-110888888'"""
         """https://cdnjs.cloudflare.com/ajax/libs/dompurify/"""
-    |]
+        """https://accounts.google.com/"""    
+        |]
     |> String.concat " "
 
 let styleSrcWithHashes = [| """'nonce-110888888'""" |] |> String.concat " "
@@ -19,12 +20,16 @@ let styleSrcWithHashes = [| """'nonce-110888888'""" |] |> String.concat " "
 let styleSrc =
     [| 
         """https://unpkg.com/open-props@1.6.13/"""
+        """https://accounts.google.com/""" 
+        """'nonce-110888888'"""
     |]
     |> String.concat " "
 
 let styleSrcElem =
     [|
         """https://unpkg.com/open-props@1.6.13/"""
+        """https://accounts.google.com/""" 
+        """'nonce-110888888'"""
     |]
     |> String.concat " "
 
@@ -34,29 +39,29 @@ let headerMiddleware =
         headers.Add("X-Content-Type-Options", "nosniff")
 
         match context.Request.Headers.TryGetValue("Accept") with
-        | true, accept ->
-            if accept |> Seq.exists (fun x -> x.Contains "text/html") then
-                headers.Add("Cross-Origin-Embedder-Policy", "corp")
-                headers.Add("Cross-Origin-Opener-Policy", "same-origin")
+        // | true, accept ->
+        //     if accept |> Seq.exists (fun x -> x.Contains "text/html") then
+        //         headers.Add("Cross-Origin-Embedder-Policy", "corp")
+        //         headers.Add("Cross-Origin-Opener-Policy", "same-origin")
 
-            headers.Add(
-                "Content-Security-Policy",
-                $"default-src 'none';\
-            font-src 'self';\
-            img-src 'self';\
-            manifest-src 'self';\
-            script-src-elem 'self' {scriptSrcElem} ;\
-            connect-src 'self' localhost ws://192.168.50.236:* ws://localhost:* http://localhost:*/dist/ https://localhost:*/dist/;\
-            style-src 'self' 'unsafe-hashes' {styleSrc} ;\
-            style-src-elem 'self' {styleSrcElem} ;\
-            worker-src 'self';\
-            form-action 'self';\
-            script-src  'wasm-unsafe-eval';\
-            frame-src 'self';\
-            require-trusted-types-for 'script';\
-            trusted-types * 'allow-duplicates';\
-            "
-            )
+            // headers.Add(
+            //     "Content-Security-Policy-Report-Only",
+            //     $"default-src *;\
+            // font-src 'self';\
+            // img-src 'self';\
+            // manifest-src 'self';\
+            // script-src-elem 'self' {scriptSrcElem} ;\
+            // connect-src 'self' localhost ws://192.168.50.236:* ws://localhost:* http://localhost:*/dist/ https://localhost:*/dist/;\
+            // style-src * ;\
+            // style-src-elem 'self' {styleSrcElem} ;\
+            // worker-src 'self';\
+            // form-action 'self';\
+            // script-src  'wasm-unsafe-eval';\
+            // frame-src 'self';\
+            // require-trusted-types-for 'script';\
+            // trusted-types * 'allow-duplicates';\
+            // "
+            // )
         | _ -> ()
 
         next.Invoke()
