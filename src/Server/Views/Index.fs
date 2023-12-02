@@ -7,11 +7,11 @@ open HolidayTracker.ServerInterfaces.Query
 open HolidayTracker.Shared.Model
 open System
 
-let view (env: _) (_: HttpContext) (dataLevel: int) =
+let view (env: _) (ctx: HttpContext) (dataLevel: int) =
     task {
         let query = env :> IQuery
         let! countries = query.Query<Country>()
-
+        let user = ctx.User.Identity.Name
         let countryNames =
             countries
             |> List.map (fun country -> 
@@ -31,7 +31,7 @@ let view (env: _) (_: HttpContext) (dataLevel: int) =
         return
             html
                 $""" 
-            <ht-signin></ht-signin>
+            <ht-signin username={user}></ht-signin>
             <ht-countries-selector>
                 <h{dataLevel + 1}> Countries </h{dataLevel + 1}>
                 <fieldset>

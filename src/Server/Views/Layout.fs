@@ -41,7 +41,7 @@ let view (ctx: HttpContext) (env: _) (isDev) (body: int -> Task<string>) =
                 String.Join("\r\n", scripts)
 
         let! body = body 1
-
+        let user = ctx.User.Identity.Name
         return
             html
                 $"""
@@ -86,12 +86,17 @@ let view (ctx: HttpContext) (env: _) (isDev) (body: int -> Task<string>) =
                 <h1> Alarms Global </h1>
             </header>
             <main>
+                <p> Current user: {user}</p>
                 {body}
                 <!-- Below is not used but required otherwise dynamic google sigin button won't appear-->
-                <div 
-                    class="hidden"
-                    id="g_id_onload"
-                    data-client_id="961379412830-oe2516pvftiv91i2hga07u4n96vtu1lr.apps.googleusercontent.com"></div>
+                    <div class="hidden">
+                        <div id="g_id_onload"
+                                data-client_id="961379412830-oe2516pvftiv91i2hga07u4n96vtu1lr.apps.googleusercontent.com"
+                                data-context="signin"
+                                data-ux_mode="popup"
+                                data-login_uri="http://localhost:5070/signin-google"
+                                data-auto_prompt="false"></div>
+                    </div>
             </main>
             <footer>
                 <a href="/privacy">Privacy Policy</a>
