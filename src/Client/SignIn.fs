@@ -61,8 +61,7 @@ let view (host: LitElement) (model: Model) dispatch =
 
                     dialog.showModal ()
                     dialog.removeAttribute("hidden")
-                    let googleSignin = document.getElementById("g_id_onload2")
-                    googleSignin?style?width <- "208px"
+                    let googleSignin = document.getElementById("google-signin")
                     google?accounts?id?renderButton( googleSignin,{|  |})
             | _ -> ()
     )
@@ -129,7 +128,7 @@ let view (host: LitElement) (model: Model) dispatch =
 
                     <article>
                     <div>
-                        <div id="g_id_onload2"
+                        <div id="google-signin"
                                 data-client_id="961379412830-oe2516pvftiv91i2hga07u4n96vtu1lr.apps.googleusercontent.com"
                                 data-context="signin"
                                 data-ux_mode="popup"
@@ -145,15 +144,7 @@ let view (host: LitElement) (model: Model) dispatch =
                             data-logo_alignment="left">
                         </div>
                     </div>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nesciunt alias. Tenetur, eos reiciendis deserunt possimus sit minus earum aspernatur?</p>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, nesciunt alias. Tenetur, eos reiciendis deserunt possimus sit minus earum aspernatur?</p>
                     </article>
-                    <footer>
-                        <menu>
-                            <button type="reset" @click={Ev(fun _ -> dispatch LoginCancelled)}>Cancel</button>
-                            <button type="submit" value="confirm">Confirm</button>
-                        </menu>
-                    </footer>
                 </form>
             </dialog>
         """

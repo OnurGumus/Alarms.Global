@@ -13,6 +13,13 @@ animation;
         flex-direction: column;
         align-items: center;
     }
+    #google-signin{
+        inline-size:212px;
+        > div{
+            display:flex;
+            justify-content:center;
+        }
+    }
 }
 @layer appearance {
     li{
