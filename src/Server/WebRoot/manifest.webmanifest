@@ -10,6 +10,7 @@
     "theme_color": "#E1477E",
     "description": "Alarms Global",
     "orientation": "any",
+    
     "background_color": "#E1477E",
     "related_applications": [],
     "prefer_related_applications": false,
