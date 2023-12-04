@@ -13,7 +13,6 @@
     "background_color": "#E1477E",
     "related_applications": [],
     "prefer_related_applications": false,
-    
     "icons": [
       {
         "src": "/assets/icons/icon-512.png",
@@ -27,6 +26,8 @@
         "type": "image/png",
         "purpose": "maskable"
       }
+      
+     
     ],
     "screenshots": [
       {

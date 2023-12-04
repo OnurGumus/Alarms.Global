@@ -27,11 +27,15 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
                     </label>
                 </li>""")
             |> String.concat Environment.NewLine
-
+        let siginIn = 
+            match user with
+            | null | "" -> html $"<ht-signin></ht-signin>"
+            | _ ->  html $"<ht-signin username={user}></ht-signin>"
+            
         return
             html
                 $""" 
-            <ht-signin username={user}></ht-signin>
+            {siginIn}
             <ht-countries-selector>
                 <h{dataLevel + 1}> Countries </h{dataLevel + 1}>
                 <fieldset>
