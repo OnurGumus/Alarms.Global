@@ -36,11 +36,18 @@ let prepareClaimsPrincipal name (config:IConfiguration) =
         |> ClaimsPrincipal
 
 
-
 open Google.Apis.Auth
 open Google.Apis.Auth.OAuth2
 open Serilog
 open HolidayTracker.Shared.Model
+
+let signOut (env: #_) : HttpHandler =
+    fun (next: HttpFunc) (ctx: HttpContext) ->
+        task {
+            do! ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme) |> Async.AwaitTask
+            ctx.SetHttpHeader("Location", "/")
+            return! setStatusCode 303 earlyReturn ctx
+        }
 
 
 let googleSignIn (env: #_) : HttpHandler =

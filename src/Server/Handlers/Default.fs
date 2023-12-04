@@ -17,11 +17,12 @@ let webApp (env: _) (layout: HttpContext -> (int -> Task<string>) -> string Task
             }
 
     let defaultRoute = viewRoute (Index.view env)
+
     choose [
-        
         routeCi "/" >=> defaultRoute
         routeCi "/privacy" >=> viewRoute (Privacy.view env)
         POST >=> route "/signin-google" >=> (googleSignIn env)
+        POST >=> route "/sign-out" >=> (signOut env)
     ]
 
 let webAppWrapper (env: _) (layout: HttpContext -> (int -> Task<string>) -> string Task) =

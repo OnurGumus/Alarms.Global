@@ -94,12 +94,10 @@ let view (host: LitElement) (model: Model) dispatch =
     | LoggedIn user ->
         html
             $"""
-         <div class=user-info>
-            <img src="/assets/user.svg" class="user-icon" />
-            <div>
                 <span class=username>{user.Value}</span>
-                <a class=sign-out
-                @click={Ev(fun _ -> dispatch (LogoutRequested))}>Sign Out</a>
+                <form action="/sign-out" method="post">
+                    <button type="submit">Sign Out</button>
+                </form>
             </div>
         </div>
         """
