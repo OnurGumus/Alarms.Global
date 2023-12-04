@@ -48,7 +48,10 @@ let googleSignIn (env: #_) : HttpHandler =
         task {
             Log.Information("google login start")
             let token = ctx.Request.Form.["credential"][0]
-            Log.Information("google login token: {token}", token)
+            let csrf = ctx.Request.Form.["g_csrf_token"][0]
+            if ctx.Request.Cookies["g_csrf_token"] <> csrf then
+                return! setStatusCode 401 earlyReturn ctx
+            else
             let! payload = GoogleJsonWebSignature.ValidateAsync(token)
             let config = env :> IConfiguration
             let email = payload.Email
