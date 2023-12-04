@@ -28,8 +28,9 @@ let rec execute (host: LitElement) order dispatch =
     | ShowError ex -> window.alert ex
 
     | _ -> ()
+
 [<Global>]
-let google:obj = jsNative
+let google: obj = jsNative
 
 [<HookComponent>]
 let view (host: LitElement) (model: Model) dispatch =
@@ -60,9 +61,9 @@ let view (host: LitElement) (model: Model) dispatch =
                     )
 
                     dialog.showModal ()
-                    dialog.removeAttribute("hidden")
-                    let googleSignin = document.getElementById("google-signin")
-                    google?accounts?id?renderButton( googleSignin,{|  |})
+                    dialog.removeAttribute ("hidden")
+                    let googleSignin = document.getElementById ("google-signin")
+                    google?accounts?id?renderButton (googleSignin, {| |})
             | _ -> ()
     )
 

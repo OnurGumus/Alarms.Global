@@ -17,23 +17,23 @@ open HolidayTracker.Shared.Model
 open System.IO
 open System.Collections.Generic
 
+let prepareClaimsPrincipal name (config: IConfiguration) =
+    let admins =
+        config.GetSection("config:admins").AsEnumerable()
+        |> Seq.map (fun x -> x.Value)
+        |> Seq.filter (isNull >> not)
+        |> Set.ofSeq
 
-let prepareClaimsPrincipal name (config:IConfiguration) =
-        let admins =
-            config.GetSection("config:admins").AsEnumerable()
-            |> Seq.map (fun x -> x.Value)
-            |> Seq.filter (isNull >> not)
-            |> Set.ofSeq
-        let claims = [ Claim(ClaimTypes.Name, name) ]
+    let claims = [ Claim(ClaimTypes.Name, name) ]
 
-        let claims =
-            if admins |> Set.contains name then
-                Claim(ClaimTypes.Role, "admin") :: claims
-            else
-                claims
+    let claims =
+        if admins |> Set.contains name then
+            Claim(ClaimTypes.Role, "admin") :: claims
+        else
+            claims
 
-        ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)
-        |> ClaimsPrincipal
+    ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)
+    |> ClaimsPrincipal
 
 
 open Google.Apis.Auth
@@ -44,11 +44,13 @@ open HolidayTracker.Shared.Model
 let signOut (env: #_) : HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
-            do! ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme) |> Async.AwaitTask
+            do!
+                ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme)
+                |> Async.AwaitTask
+
             ctx.SetHttpHeader("Location", "/")
             return! setStatusCode 303 earlyReturn ctx
         }
-
 
 let googleSignIn (env: #_) : HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
@@ -56,22 +58,23 @@ let googleSignIn (env: #_) : HttpHandler =
             Log.Information("google login start")
             let token = ctx.Request.Form.["credential"][0]
             let csrf = ctx.Request.Form.["g_csrf_token"][0]
+
             if ctx.Request.Cookies["g_csrf_token"] <> csrf then
                 return! setStatusCode 401 earlyReturn ctx
             else
-            let! payload = GoogleJsonWebSignature.ValidateAsync(token)
-            let config = env :> IConfiguration
-            let email = payload.Email
-            let name = payload.Name
-            let userId = email |> UserClientId.TryCreate |> forceValidate
+                let! payload = GoogleJsonWebSignature.ValidateAsync(token)
+                let config = env :> IConfiguration
+                let email = payload.Email
+                let name = payload.Name
+                let userId = email |> UserClientId.TryCreate |> forceValidate
 
-            let p = prepareClaimsPrincipal userId.Value config
-            let authProps = AuthenticationProperties()
-            authProps.IsPersistent <- true
-            do! ctx.SignInAsync(p,authProps) |> Async.AwaitTask
+                let p = prepareClaimsPrincipal userId.Value config
+                let authProps = AuthenticationProperties()
+                authProps.IsPersistent <- true
+                do! ctx.SignInAsync(p, authProps) |> Async.AwaitTask
 
-            Log.Information("google login done: {email} {name}", email, name)
+                Log.Information("google login done: {email} {name}", email, name)
 
-            ctx.SetHttpHeader("Location", "/")
-            return! setStatusCode 303 earlyReturn ctx
+                ctx.SetHttpHeader("Location", "/")
+                return! setStatusCode 303 earlyReturn ctx
         }
