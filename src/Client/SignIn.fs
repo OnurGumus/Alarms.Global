@@ -63,7 +63,13 @@ let view (host: LitElement) (model: Model) dispatch =
                     dialog.showModal ()
                     dialog.removeAttribute ("hidden")
                     let googleSignin = document.getElementById ("google-signin")
-                    google?accounts?id?renderButton (googleSignin, {| |})
+                    google?accounts?id?renderButton (googleSignin, {| 
+                        ``type``= "standard";
+                         shape = "rectangular"; 
+                         theme= "outline";
+                         text= "signin_with";size= "medium"; 
+                         logo_alignment="right";|})
+                   
             | _ -> ()
     )
 
@@ -112,11 +118,11 @@ let view (host: LitElement) (model: Model) dispatch =
     | AskEmail ->
         html
             $"""
-            <dialog hidden {Lit.refValue dialogRef}> 
+            <dialog aria-labelledby="signin-header" hidden {Lit.refValue dialogRef}> 
                 <form method="dialog" >
                     <header> 
-                        <h2>Sign in</h2>
-                        <button type="button" @click={Ev(fun _ -> dispatch LoginCancelled)} title="Close dialog"> 
+                        <h2 id="signin-header">Sign in</h2>
+                        <button  type="button" @click={Ev(fun _ -> dispatch LoginCancelled)} title="Close dialog"> 
                             <title>Close dialog icon</title>
                             <svg width="24" height="24" viewBox="0 0 24 24">
                             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -126,23 +132,7 @@ let view (host: LitElement) (model: Model) dispatch =
                     </header>
 
                     <article>
-                    <div>
-                        <div id="google-signin"
-                                data-client_id="961379412830-oe2516pvftiv91i2hga07u4n96vtu1lr.apps.googleusercontent.com"
-                                data-context="signin"
-                                data-ux_mode="popup"
-                                data-login_uri="http://localhost:5070/signin-google"
-                                data-auto_prompt="false"></div>
-
-                        <div class="g_id_signin"
-                            data-type="standard"
-                            data-shape="rectangular"
-                            data-theme="outline"
-                            data-text="signin_with"
-                            data-size="small"
-                            data-logo_alignment="left">
-                        </div>
-                    </div>
+                        <div id="google-signin"></div>
                     </article>
                 </form>
             </dialog>
