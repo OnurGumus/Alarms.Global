@@ -33,7 +33,7 @@ let rec execute (host: LitElement) order dispatch =
 let google: obj = jsNative
 
 [<HookComponent>]
-let view (host: LitElement) (model: Model) dispatch =
+let view (host: LitElement) (model: Model) dispatch (headingLevel: int) =
 
     let dialogRef = Hook.useRef<HTMLDialogElement> ()
 
@@ -120,12 +120,19 @@ let view (host: LitElement) (model: Model) dispatch =
         """
     | AskVerification
     | AskEmail ->
+
+        let heading =
+            let html = id
+
+            html $"""<h{headingLevel} id="signin-header">Sign in</h{headingLevel}>"""
+            |> LitBindings.unsafeHTML
+
         html
             $"""
             <dialog aria-labelledby="signin-header" hidden {Lit.refValue dialogRef}> 
                 <form method="dialog" >
                     <header> 
-                        <h2 id="signin-header">Sign in</h2>
+                        {heading}
                         <button  type="button" @click={Ev(fun _ -> dispatch LoginCancelled)} title="Close dialog"> 
                             <title>Close dialog icon</title>
                             <svg width="24" height="24" viewBox="0 0 24 24">
@@ -149,7 +156,10 @@ let LitElement () =
     let host, prop =
         LitElement.init (fun config ->
             config.useShadowDom <- false
-            config.props <- {| username = Prop.Of(Option.None, attribute = "username") |})
+
+            config.props <-
+                {| username = Prop.Of(Option.None, attribute = "username")
+                   headingLevel = Prop.Of(1, attribute = "heading-level") |})
 
     let program =
         Program.mkHiddenProgramWithSideEffectExecute (init prop.username.Value) update (execute host)
@@ -158,6 +168,6 @@ let LitElement () =
         |> Program.withConsoleTrace
 #endif
     let model, dispatch = Hook.useElmish program
-    view host model dispatch
+    view host model dispatch (prop.headingLevel.Value + 1)
 
 let register () = ()

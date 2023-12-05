@@ -29,11 +29,13 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
                     </label>
                 </li>""")
             |> String.concat Environment.NewLine
-        let siginIn = 
+
+        let siginIn =
             match user with
-            | null | "" -> html $"<ht-signin></ht-signin>"
-            | _ ->  html $"<ht-signin username={user}></ht-signin>"
-            
+            | null
+            | "" -> html $"<ht-signin heading-level={dataLevel}></ht-signin>"
+            | _ -> html $"<ht-signin heading-level={dataLevel} username={user}></ht-signin>"
+
         return
             html
                 $""" 
