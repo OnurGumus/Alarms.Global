@@ -63,13 +63,17 @@ let view (host: LitElement) (model: Model) dispatch =
                     dialog.showModal ()
                     dialog.removeAttribute ("hidden")
                     let googleSignin = document.getElementById ("google-signin")
-                    google?accounts?id?renderButton (googleSignin, {| 
-                        ``type``= "standard";
-                         shape = "rectangular"; 
-                         theme= "outline";
-                         text= "signin_with";size= "medium"; 
-                         logo_alignment="right";|})
-                   
+
+                    google?accounts?id?renderButton (
+                        googleSignin,
+                        {| ``type`` = "standard"
+                           shape = "rectangular"
+                           theme = "outline"
+                           text = "signin_with"
+                           size = "medium"
+                           logo_alignment = "right" |}
+                    )
+
             | _ -> ()
     )
 
