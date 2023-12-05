@@ -12,11 +12,13 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
         let query = env :> IQuery
         let! countries = query.Query<Country>()
         let user = ctx.User.Identity.Name
+
         let countryNames =
             countries
-            |> List.map (fun country -> 
+            |> List.map (fun country ->
 
-                html $"""
+                html
+                    $"""
                 <li>
                     <label class="gui-switch">
                         {country.Name.Value}
