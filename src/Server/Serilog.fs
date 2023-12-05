@@ -11,11 +11,12 @@ open Serilog.Filters
 open Microsoft.AspNetCore.Http
 open Serilog.Context
 open System.Threading.Tasks
+open Serilog.Sinks.SystemConsole.Themes
 
 let bootstrapLogger () =
     Log.Logger <-
         LoggerConfiguration()
-            .WriteTo.Console()
+            .WriteTo.Console(theme= AnsiConsoleTheme.Literate, applyThemeToRedirectedOutput= true)
             .WriteTo.File(
                 new CompactJsonFormatter(),
                 "logs/log_boot_strapper_json_.txt",
@@ -59,7 +60,7 @@ let configureMiddleware _ (services: IServiceProvider) (loggerConfiguration: Log
         )
         .WriteTo.File(new CompactJsonFormatter(), "logs/log_json_.txt", rollingInterval = RollingInterval.Day)
         .Destructure.FSharpTypes()
-        .WriteTo.Console()
+        .WriteTo.Console(theme= AnsiConsoleTheme.Literate, applyThemeToRedirectedOutput= true)
 #if DEBUG
         .WriteTo.Seq("http://localhost:5341")
 #else
