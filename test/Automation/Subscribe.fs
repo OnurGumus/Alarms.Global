@@ -18,9 +18,8 @@ let ``I am not authenticated`` (context: IBrowserContext) =
 
 [<When>]
 let ``I try to select a country`` (page: IPage) =
-    printfn "when"
-    (task { return (page) }).Result
+    (task { do! page.GetByRole(AriaRole.Switch).First.ClickAsync() }).Wait()
 
 [<Then>]
-let ``system should require me to login`` (page: IPage) = 
-    printfn "then"
+let ``system should require me to login`` (page: IPage) =
+    (task { do! Expect(page.GetByText("Sign in")).ToBeVisibleAsync() }).Wait()
