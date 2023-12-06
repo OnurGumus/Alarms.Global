@@ -11,7 +11,7 @@ let ``I am not authenticated`` (context: IBrowserContext) =
         do! context.ClearCookiesAsync()
         do! Task.Delay 2000
         let! page = context.NewPageAsync()
-        let! _ = page.GotoAsync("http://localhost:5070")
+        let! _ = page.GotoAsync("http://localhost:5070?test-user")
         return (page)
     })
         .Result
@@ -22,4 +22,5 @@ let ``I try to select a country`` (page: IPage) =
 
 [<Then>]
 let ``system should require me to login`` (page: IPage) =
-    (task { do! Expect(page.GetByRole(AriaRole.Dialog).GetByText("Sign in")).ToBeVisibleAsync() }).Wait()
+    (task { do! Expect(page.GetByRole(AriaRole.Dialog).GetByText("Sign in")).ToBeVisibleAsync() })
+        .Wait()
