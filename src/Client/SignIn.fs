@@ -134,7 +134,7 @@ let view (host: LitElement) (model: Model) dispatch (headingLevel: int) =
                     $"""
                     <form action=signin-test method=post>
                         <div>
-                            <input type=text name=test-user>
+                            <input type=text placeholder="User name" name=test-user>
                         </div>
                         <button type="submit"> Sign in test user </button>
                     </form>

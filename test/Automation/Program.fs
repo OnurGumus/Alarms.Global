@@ -11,7 +11,7 @@ let main _ =
                 let ass = Assembly.GetExecutingAssembly()
                 let definitions = StepDefinitions(ass)
 
-                [ "Subscribe" ]
+                [ "Subscribe"; "Authenticate" ]
                 |> Seq.iter (fun source ->
                     let stream = ass.GetManifestResourceStream("Automation." + source + ".feature")
                     definitions.Execute(source, stream))
