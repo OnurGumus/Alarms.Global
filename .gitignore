@@ -51,3 +51,4 @@ nCrunchTemp_*
 
 src/Server/WebRoot/dist/
 src/Client/vite.config.ts.timestamp*.mjs
+src/Shared/Shared.csproj
