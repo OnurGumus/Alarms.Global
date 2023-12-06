@@ -127,6 +127,23 @@ let view (host: LitElement) (model: Model) dispatch (headingLevel: int) =
             html $"""<h{headingLevel} id="signin-header">Sign in</h{headingLevel}>"""
             |> LitBindings.unsafeHTML
 
+        let testLogin =
+#if DEBUG
+            if window.location.search.Contains("test-user") then
+                html
+                    $"""
+                    <form action=signin-test method=post>
+                        <div>
+                            <input type=text name=test-user>
+                        </div>
+                        <button type="submit"> Sign in test user </button>
+                    </form>
+                """
+            else
+                Lit.nothing
+#else
+            Lit.nothing
+#endif
         html
             $"""
             <dialog aria-labelledby="signin-header" hidden {Lit.refValue dialogRef}> 
@@ -144,6 +161,7 @@ let view (host: LitElement) (model: Model) dispatch (headingLevel: int) =
 
                     <article>
                         <div id="google-signin"></div>
+                        {testLogin}
                     </article>
                 </form>
             </dialog>

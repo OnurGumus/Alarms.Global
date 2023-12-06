@@ -22,6 +22,9 @@ let webApp (env: _) (layout: HttpContext -> (int -> Task<string>) -> string Task
         routeCi "/" >=> defaultRoute
         routeCi "/privacy" >=> viewRoute (Privacy.view env)
         POST >=> route "/signin-google" >=> (googleSignIn env)
+#if DEBUG
+        POST >=> route "/signin-test" >=> (testSignIn env)
+#endif
         POST >=> route "/sign-out" >=> (signOut env)
     ]
 

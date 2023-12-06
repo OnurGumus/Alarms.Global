@@ -78,3 +78,24 @@ let googleSignIn (env: #_) : HttpHandler =
                 ctx.SetHttpHeader("Location", "/")
                 return! setStatusCode 303 earlyReturn ctx
         }
+
+let testSignIn (env: #_) : HttpHandler =
+    fun (next: HttpFunc) (ctx: HttpContext) ->
+        task {
+            Log.Information("test login start")
+            let testUser = ctx.Request.Form.["test-user"][0]
+
+            let config = env :> IConfiguration
+            let email = testUser
+            let userId = email |> UserClientId.TryCreate |> forceValidate
+
+            let p = prepareClaimsPrincipal userId.Value config
+            let authProps = AuthenticationProperties()
+            authProps.IsPersistent <- true
+            do! ctx.SignInAsync(p, authProps) |> Async.AwaitTask
+
+            Log.Information("test login done: {email}", email)
+
+            ctx.SetHttpHeader("Location", "/")
+            return! setStatusCode 303 earlyReturn ctx
+        }
