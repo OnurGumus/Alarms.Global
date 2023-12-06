@@ -22,5 +22,11 @@ let ``I try to select a country`` (page: IPage) =
 
 [<Then>]
 let ``system should require me to login`` (page: IPage) =
-    (task { do! Expect(page.GetByRole(AriaRole.Dialog).GetByText("Sign in")).ToBeVisibleAsync() })
+    let exact = LocatorGetByTextOptions(Exact = true)
+
+    (task {
+        do!
+            Expect(page.GetByRole(AriaRole.Dialog).GetByText("Sign in", exact))
+                .ToBeVisibleAsync()
+    })
         .Wait()
