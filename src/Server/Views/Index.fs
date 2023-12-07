@@ -19,15 +19,20 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
 
                 html
                     $"""
-                <li>
-                    <label class="gui-switch">
-                        {country.Name.Value}
-                        <input is="gui-switch"
-                            data-id={country.CountryId.Value}
-                            data-name={country.Name.Value}
-                            class="country-selector" type="checkbox" role="switch">
+                    <label class="setting">
+                        <span class="setting__label"> {country.Name.Value}</span>
+                        <span class="switch">
+                            <input class="switch__input" 
+                                data-id={country.CountryId.Value}
+                                data-name={country.Name.Value} 
+                                type="checkbox" role="switch" name="switch1">
+                            <span class="switch__fill" aria-hidden="true">
+                                <span class="switch__text">ON</span>
+                                <span class="switch__text">OFF</span>
+                            </span>
+                        </span>
                     </label>
-                </li>""")
+                """)
             |> String.concat Environment.NewLine
 
         let siginIn =
@@ -42,12 +47,11 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
             {siginIn}
             <ht-countries-selector>
                 <h{dataLevel + 1}> Countries </h{dataLevel + 1}>
-                <fieldset>
-                    <legend>Choose countries to subscribe</legend>
-                    <ul>
+                <form>
+                    
                         {countryNames}
-                    </ul>
-                </fieldset>
+                  
+                </form>
             </ht-countries-selector>
         """
     }

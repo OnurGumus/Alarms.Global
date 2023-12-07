@@ -13,6 +13,9 @@ animation;
         flex-direction: column;
         align-items: center;
     }
+    main{
+        min-inline-size:390px;
+    }
     #google-signin{
         inline-size:212px;
         > div{
