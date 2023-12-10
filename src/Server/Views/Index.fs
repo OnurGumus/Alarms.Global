@@ -48,9 +48,7 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
             <ht-countries-selector>
                 <h{dataLevel + 1}> Countries </h{dataLevel + 1}>
                 <form>
-                    
-                        {countryNames}
-                  
+                    {countryNames}
                 </form>
             </ht-countries-selector>
         """
