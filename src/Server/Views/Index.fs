@@ -22,7 +22,7 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
                     <label class="setting">
                         <span class="setting__label"> {country.Name.Value}</span>
                         <span class="switch">
-                            <input class="switch__input" 
+                            <input class="switch__input country-selector"
                                 data-id={country.CountryId.Value}
                                 data-name={country.Name.Value} 
                                 type="checkbox" role="switch" name="switch1">
