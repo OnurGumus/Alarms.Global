@@ -313,7 +313,7 @@ form:has(.setting) {
 		--primary: hsl(var(--hue),90%,70%);
 		--primary-t: hsla(var(--hue),90%,70%,0);
 	}
-	form {
+	form:has(.setting){
 		background-color: hsl(var(--hue),10%,30%);
 	}
 	.setting {
