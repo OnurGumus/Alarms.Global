@@ -16,7 +16,7 @@ Feature: Authentication
     When I sign in
     Then I should be signed in
 
-  # Scenario: Sign Out
-  #   Given I am Signed In
-  #   When I sign out
-  #   Then I should be signed out
+  Scenario: Sign Out
+    Given I am signed in
+    When I sign out
+    Then I should be signed out
