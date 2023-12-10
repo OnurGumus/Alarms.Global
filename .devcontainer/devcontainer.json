@@ -24,7 +24,8 @@
 		// "ASPNETCORE_Kestrel__Certificates__Default__Path": "/home/vscode/.aspnet/https/aspnetapp.pfx",
 		"ASPNETCORE_ENVIRONMENT":"Development",
 		//Use the following line instead once you have certificate
-		"ASPNETCORE_URLS":"http://+:5070"
+		"ASPNETCORE_URLS":"http://+:5070",
+		"DOTNET_WATCH_SUPPRESS_BROWSER_REFRESH":"true"
 	
 	},
     // 3. Do one of the following depending on your scenario:

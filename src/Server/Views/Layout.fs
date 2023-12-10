@@ -27,7 +27,6 @@ let view (ctx: HttpContext) (env: _) (isDev) (body: int -> Task<string>) =
                     $"""
                 <script type="module" src="/dist/@vite/client"></script>
                 <script type="module" src="/dist/build/App.js"></script>
-                <script defer src="/_framework/aspnetcore-browser-refresh.js"></script>
             """
             else
                 let scripts =
