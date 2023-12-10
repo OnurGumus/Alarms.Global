@@ -10,7 +10,7 @@ open System
 let view (env: _) (ctx: HttpContext) (dataLevel: int) =
     task {
         let query = env :> IQuery
-        let! countries = query.Query<Country>()
+        let! countries = query.Query<Region>()
         let user = ctx.User.Identity.Name
 
         let countryNames =
@@ -23,7 +23,7 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
                         <span class="setting__label"> {country.Name.Value}</span>
                         <span class="switch">
                             <input class="switch__input country-selector"
-                                data-id={country.CountryId.Value}
+                                data-id={country.RegionId.Value}
                                 data-name={country.Name.Value} 
                                 type="checkbox" role="switch" name="switch1">
                             <span class="switch__fill" aria-hidden="true">

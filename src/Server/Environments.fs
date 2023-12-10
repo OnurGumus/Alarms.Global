@@ -19,7 +19,7 @@ type AppEnv(config: IConfiguration) =
     interface IQuery with
         member _.Query<'t>(?filter, ?orderby, ?orderbydesc, ?thenby, ?thenbydesc, ?take, ?skip) =
             let res =
-                if typeof<'t> = typeof<Country> then
+                if typeof<'t> = typeof<Region> then
                     [
                         "Argentina"
                         "Brazil"
@@ -29,7 +29,9 @@ type AppEnv(config: IConfiguration) =
                     ]|>
                     List.map(fun name -> 
                     {
-                        CountryId = CountryId.CreateNew() 
+                        RegionId = RegionId.CreateNew() 
+                        AlrernateNames = []
+                        RegionType = Country
                         Name = name |> ShortString.TryCreate |> forceValidate
                     })
                     |> List.ofSeq |> box

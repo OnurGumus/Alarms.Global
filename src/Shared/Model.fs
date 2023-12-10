@@ -32,6 +32,7 @@ type Predicate =
 
 type Version =
     | Version of int64
+
     member this.Value: int64 = let (Version v) = this in v
     member _.Zero = Version 0L
 
@@ -52,6 +53,7 @@ type ShortString =
             |> t.MaxLen 255 ShortStringError.TooLongString
             |> t.Map ShortString
             |> t.End)
+
     static member Validate(s: ShortString) =
         s.Value |> ShortString.TryCreate |> forceValidate
 
@@ -71,19 +73,26 @@ type LongString =
 
     override this.ToString() = this.Value
 
-type CountryId =
-    | CountryId of ShortString
+type RegionType = Country
 
-    member this.Value = let (CountryId orderId) = this in orderId
+type RegionId =
+    | RegionId of ShortString
+
+    member this.Value = let (RegionId rid) = this in rid
 
     static member CreateNew() =
-        "Country_" + Guid.NewGuid().ToString()
+        "Region_" + Guid.NewGuid().ToString()
         |> ShortString.TryCreate
         |> forceValidate
-        |> CountryId
+        |> RegionId
 
-type Country =
-    { CountryId: CountryId
+    static member Validate(s: LongString) =
+        s.Value |> ShortString.TryCreate |> forceValidate
+
+type Region =
+    { RegionId: RegionId
+      RegionType: RegionType
+      AlrernateNames : ShortString list
       Name: ShortString }
 
 module Authentication =
@@ -130,7 +139,10 @@ module Authentication =
             s.Value |> Email.TryCreate |> forceValidate
 
     type UserClientId = Email
-    type User = { UserClientId: UserClientId; Version: Version }
+
+    type User =
+        { UserClientId: UserClientId
+          Version: Version }
 
     type VerificationError =
         | EmptyVerificationCode
