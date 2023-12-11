@@ -1,4 +1,5 @@
 module HolidayTracker.Shared.Command
+open HolidayTracker.Shared.Model.Subscription
 
 module Subscription =
     open Model
