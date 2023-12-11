@@ -11,6 +11,7 @@
     <Compile Include="Views/Layout.fs" />
     <Compile Include="Views/Privacy.fs" />
     <Compile Include="Handlers\Authentication.fs" />
+    <Compile Include="Handlers\Subscription.fs" />
     <Compile Include="Handlers/Default.fs" />
     <Compile Include="DB.fs" />
     <Compile Include="Environments.fs" />

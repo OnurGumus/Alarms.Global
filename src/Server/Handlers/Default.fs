@@ -18,6 +18,9 @@ let webApp (env: _) (layout: HttpContext -> (int -> Task<string>) -> string Task
 
     let defaultRoute = viewRoute (Index.view env)
 
+    let auth =
+        requiresAuthentication (challenge CookieAuthenticationDefaults.AuthenticationScheme)
+
     choose [
         routeCi "/" >=> defaultRoute
         routeCi "/privacy" >=> viewRoute (Privacy.view env)
@@ -26,6 +29,10 @@ let webApp (env: _) (layout: HttpContext -> (int -> Task<string>) -> string Task
         POST >=> route "/signin-test" >=> (testSignIn env)
 #endif
         POST >=> route "/sign-out" >=> (signOut env)
+
+        routex @".*(?:Subscribe|Unsubscribe).*"
+        >=> auth
+        >=> (Subscription.subscriptionHandler env)
     ]
 
 let webAppWrapper (env: _) (layout: HttpContext -> (int -> Task<string>) -> string Task) =

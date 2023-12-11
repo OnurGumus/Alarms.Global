@@ -4,6 +4,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Command.fs" />
     <Compile Include="Query.fs" />
   </ItemGroup>
   <ItemGroup>
