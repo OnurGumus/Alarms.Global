@@ -17,7 +17,7 @@ open Thoth.Json
 open HolidayTracker.Shared
 open CountriesSelector
 open ElmishSideEffect
-open HolidayTracker.Shared.Model
+open HolidayTracker.Shared.Model.Subscription
 
 let private hmr = HMR.createToken ()
 

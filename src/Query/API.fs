@@ -2,6 +2,7 @@
 
 open Microsoft.Extensions.Configuration
 open HolidayTracker.Shared.Model
+open Subscription
 open Thoth.Json.Net
 open HolidayTracker.ServerInterfaces.Query
 open Projection

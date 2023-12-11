@@ -73,30 +73,6 @@ type LongString =
 
     override this.ToString() = this.Value
 
-type RegionType = Country
-
-type RegionId =
-    | RegionId of ShortString
-
-    member this.Value = let (RegionId rid) = this in rid
-
-    static member CreateNew() =
-        "Region_" + Guid.NewGuid().ToString()
-        |> ShortString.TryCreate
-        |> forceValidate
-        |> RegionId
-
-    static member Create(s: string) =
-        s |> ShortString.TryCreate |> forceValidate |> RegionId
-
-    static member Validate(s: LongString) =
-        s.Value |> ShortString.TryCreate |> forceValidate
-
-type Region =
-    { RegionId: RegionId
-      RegionType: RegionType
-      AlrernateNames: ShortString list
-      Name: ShortString }
 
 module Authentication =
     open System.Text.RegularExpressions
@@ -170,3 +146,30 @@ module Authentication =
 
     type Subject = ShortString
     type Body = LongString
+
+module Subscription = 
+    type RegionType = Country
+
+    type RegionId =
+        | RegionId of ShortString
+    
+        member this.Value = let (RegionId rid) = this in rid
+    
+        static member CreateNew() =
+            "Region_" + Guid.NewGuid().ToString()
+            |> ShortString.TryCreate
+            |> forceValidate
+            |> RegionId
+    
+        static member Create(s: string) =
+            s |> ShortString.TryCreate |> forceValidate |> RegionId
+    
+        static member Validate(s: LongString) =
+            s.Value |> ShortString.TryCreate |> forceValidate
+    
+    type Region =
+        { RegionId: RegionId
+          RegionType: RegionType
+          AlrernateNames: ShortString list
+          Name: ShortString }
+    

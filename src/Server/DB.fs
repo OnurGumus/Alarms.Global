@@ -8,6 +8,7 @@ open Microsoft.Extensions.Configuration
 open System.Collections.Generic
 open HolidayTracker.Shared.Model
 open Thoth.Json.Net
+open Subscription
 
 let extraThoth = Extra.empty |> Extra.withInt64 |> Extra.withDecimal
 let inline encode<'T> =

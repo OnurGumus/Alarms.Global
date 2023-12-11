@@ -6,6 +6,7 @@ open Microsoft.AspNetCore.Http
 open HolidayTracker.ServerInterfaces.Query
 open HolidayTracker.Shared.Model
 open System
+open Subscription
 
 let view (env: _) (ctx: HttpContext) (dataLevel: int) =
     task {
