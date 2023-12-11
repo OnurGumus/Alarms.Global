@@ -17,8 +17,17 @@ open Thoth.Json
 open HolidayTracker.Shared
 open CountriesSelector
 open ElmishSideEffect
+open HolidayTracker.Shared.Model
 
 let private hmr = HMR.createToken ()
+
+module Server =
+    open Fable.Remoting.Client
+
+    let api: API.Subscription =
+        Remoting.createApi ()
+        |> Remoting.withRouteBuilder (API.Route.builder None)
+        |> Remoting.buildProxy<API.Subscription>
 
 let rec execute (host: HTMLElement) sideEffect (dispatch: Msg -> unit) =
     match sideEffect with
@@ -42,6 +51,15 @@ let view (host: HTMLElement) (model: Model) dispatch =
                         true,
                         true
                     )
+            else
+                let target: HTMLInputElement = !!e.target
+                let id = target.getAttribute ("data-id") |> RegionId.Create
+                let ck = target.``checked``
+
+                if (ck) then
+                    (Server.api.Subscribe id) |> Async.Ignore |> Async.StartImmediate
+                else
+                    (Server.api.Unsubscribe id) |> Async.Ignore |> Async.StartImmediate
 
         let countrySelectors: seq<HTMLElement> =
             !! host.querySelectorAll(".country-selector")

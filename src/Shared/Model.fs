@@ -86,13 +86,16 @@ type RegionId =
         |> forceValidate
         |> RegionId
 
+    static member Create(s: string) =
+        s |> ShortString.TryCreate |> forceValidate |> RegionId
+
     static member Validate(s: LongString) =
         s.Value |> ShortString.TryCreate |> forceValidate
 
 type Region =
     { RegionId: RegionId
       RegionType: RegionType
-      AlrernateNames : ShortString list
+      AlrernateNames: ShortString list
       Name: ShortString }
 
 module Authentication =
