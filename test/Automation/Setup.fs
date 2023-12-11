@@ -21,7 +21,7 @@ let config = configBuilder.Build()
 Directory.SetCurrentDirectory("/workspaces/AlarmsGlobal/src/Server")
 
 let appEnv = Environments.AppEnv(config)
-
+appEnv.Init()
 let host = App.host appEnv [||]
 
 host.Start()

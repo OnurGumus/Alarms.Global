@@ -41,3 +41,6 @@ type AppEnv(config: IConfiguration) =
 
             async { return res :?> list<'t> }
     member _.Reset() = ()
+
+    member _.Init() = 
+        DB.init config

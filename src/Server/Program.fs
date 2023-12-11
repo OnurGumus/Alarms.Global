@@ -147,9 +147,11 @@ let main args =
 
     let mutable ret = 0
 
-    let appEnv = new Environments.AppEnv(config)
     try
         try
+            let appEnv = new Environments.AppEnv(config)
+            appEnv.Init()
+
             (host appEnv args).Run()
         with ex ->
             Log.Fatal(ex, "Host terminated unexpectedly")
