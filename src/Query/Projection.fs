@@ -65,7 +65,7 @@ open Akkling.Streams
 open System.Threading
 let handleEventWrapper (connectionString: string) (actorApi:IActor) (subQueue: ISourceQueue<_>) (envelop: EventEnvelope) =
     try
-       failwith "not implemented"
+       Log.Debug("Envelop:{@envelop}", envelop)
     with ex ->
         Log.Error(ex, "Error during event handling")
         actorApi.System.Terminate().Wait()
@@ -79,7 +79,7 @@ let readJournal system =
 
 let init (connectionString: string) (actorApi: IActor) =
     Log.Information("init query side")
-    let offsetCount = 0
+    let offsetCount = ctx.Main.Offsets.Individuals.HolidayTracker.OffsetCount
     
     let source =
         (readJournal actorApi.System).AllEvents(Offset.Sequence(offsetCount))

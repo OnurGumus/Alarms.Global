@@ -11,6 +11,7 @@ open Thoth.Json.Net
 open Subscription
 
 let extraThoth = Extra.empty |> Extra.withInt64 |> Extra.withDecimal
+
 let inline encode<'T> =
     Encode.Auto.generateEncoderCached<'T> (caseStrategy = CamelCase, extra = extraThoth)
     >> Encode.toString 0
@@ -56,28 +57,60 @@ let regions =
 type AddRegions() =
     inherit Migration()
 
-    override this.Up() = 
+    override this.Up() =
         this.Create
             .Table("Regions")
-            .WithColumn("RegionId").AsString().PrimaryKey()
-            .WithColumn("Name").AsString().Indexed()
-            .WithColumn("Type").AsString()
-            .WithColumn("AlternateNames").AsString()
+            .WithColumn("RegionId")
+            .AsString()
+            .PrimaryKey()
+            .WithColumn("Name")
+            .AsString()
+            .Indexed()
+            .WithColumn("Type")
+            .AsString()
+            .WithColumn("AlternateNames")
+            .AsString()
         |> ignore
+
         for region in regions do
-            let row:IDictionary<string,obj> = 
+            let row: IDictionary<string, obj> =
                 let l = [
-                    ("RegionId", region.RegionId.Value.Value:>obj)
+                    ("RegionId", region.RegionId.Value.Value :> obj)
                     "Name", region.Name.Value
-                    "Type",  region.RegionType.ToString()
-                    "AlternateNames", (region.AlrernateNames |> encode) :>obj
+                    "Type", region.RegionType.ToString()
+                    "AlternateNames", (region.AlrernateNames |> encode) :> obj
                 ]
+
                 Map.ofSeq l
+
             this.Insert.IntoTable("Regions").Row(row) |> ignore
 
 
-    override this.Down() =  this.Delete.Table("Regions") |> ignore
-       
+    override this.Down() = this.Delete.Table("Regions") |> ignore
+
+[<MigrationAttribute(2023_12_11_2101L)>]
+type AddOffsetsTable() =
+    inherit Migration()
+
+    override this.Up() =
+        this.Create
+            .Table("Offsets")
+            .WithColumn("OffsetName")
+            .AsString()
+            .PrimaryKey()
+            .WithColumn("OffsetCount")
+            .AsInt64()
+            .NotNullable()
+            .WithDefaultValue(0)
+        |> ignore
+
+        let dict: IDictionary<string, obj> = Dictionary()
+        dict.Add("OffsetName", "HolidayTracker")
+        dict.Add("OffsetCount", 0L)
+
+        this.Insert.IntoTable("Offsets").Row(dict) |> ignore
+
+    override this.Down() = this.Delete.Table("Offsets") |> ignore
 
 let updateDatabase (serviceProvider: IServiceProvider) =
     let runner = serviceProvider.GetRequiredService<IMigrationRunner>()
