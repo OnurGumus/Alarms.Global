@@ -3,6 +3,8 @@ module HolidayTracker.Shared.Constants
 [<Literal>]
 let ConfigHocon = "config.hocon"
 
+[<Literal>]
+let ConnectionString = "config:connection-string"
 module Events =
     [<Literal>]
     let LOGGED_IN = "loggedIn"

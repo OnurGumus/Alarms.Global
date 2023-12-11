@@ -33,6 +33,10 @@ nuget Microsoft.ApplicationInsights.AspNetCore
 nuget ThrottlingTroll
 nuget Google.Apis.Auth
 nuget Thoth.Json
+nuget FluentMigrator.Runner.SQLite
+nuget FluentMigrator.Runner
+nuget FluentMigrator
+nuget Microsoft.Data.SQLite
 
 group Client
     source https://api.nuget.org/v3/index.json

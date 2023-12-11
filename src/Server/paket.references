@@ -19,3 +19,7 @@ Serilog.AspNetCore
 Serilog.Sinks.Seq
 Microsoft.ApplicationInsights.AspNetCore
 Google.Apis.Auth
+FluentMigrator.Runner.SQLite
+FluentMigrator.Runner
+FluentMigrator
+Microsoft.Data.SQLite
