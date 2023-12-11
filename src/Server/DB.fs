@@ -76,7 +76,7 @@ type AddRegions() =
             this.Insert.IntoTable("Regions").Row(row) |> ignore
 
 
-    override this.Down() =  this.Delete.Table("Specials") |> ignore
+    override this.Down() =  this.Delete.Table("Regions") |> ignore
        
 
 let updateDatabase (serviceProvider: IServiceProvider) =
