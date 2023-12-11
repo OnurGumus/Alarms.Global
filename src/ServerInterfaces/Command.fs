@@ -10,4 +10,4 @@ type ISubscription =
 
 [<Interface>]
 type IAuthentication =
-    abstract AssignUserId: AssignUserId
+    abstract IdentifyUser: IdentifyUser

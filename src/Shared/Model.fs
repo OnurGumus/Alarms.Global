@@ -117,6 +117,23 @@ module Authentication =
         static member Validate(s: Email) =
             s.Value |> Email.TryCreate |> forceValidate
 
+    type UserIdentity =
+        | UserIdentity of ShortString
+
+        member this.Value = let (UserIdentity uid) = this in uid
+
+        static member CreateNew() =
+            "UserIdentity" + Guid.NewGuid().ToString()
+            |> ShortString.TryCreate
+            |> forceValidate
+            |> UserIdentity
+
+        static member Create(s: string) =
+            s |> ShortString.TryCreate |> forceValidate |> UserIdentity
+
+        static member Validate(s: LongString) =
+            s.Value |> ShortString.TryCreate |> forceValidate
+
     type UserClientId = Email
 
     type User =

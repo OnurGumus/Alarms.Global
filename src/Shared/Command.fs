@@ -4,7 +4,7 @@ open HolidayTracker.Shared.Model.Subscription
 open HolidayTracker.Shared.Model.Authentication
 
 module Authentication = 
-    type AssignUserId = UserClientId -> Async<Result<Version, string list>>
+    type IdentifyUser = UserClientId -> Async<Result<Version, string list>>
 
 module Subscription =
 
