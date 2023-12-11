@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.fsproj" />
     <ProjectReference Include="..\ServerInterfaces\ServerInterfaces.fsproj" />
+    <ProjectReference Include="..\Query\Query.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

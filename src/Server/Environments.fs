@@ -7,6 +7,8 @@ open HolidayTracker.Shared.Model
 [<System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage>]
 type AppEnv(config: IConfiguration) =
 
+    let mutable queryApi = Unchecked.defaultof<_>
+
     interface IConfiguration with
         member _.Item
             with get (key: string) = config.[key]
@@ -17,30 +19,19 @@ type AppEnv(config: IConfiguration) =
         member _.GetSection key = config.GetSection(key)
 
     interface IQuery with
-        member _.Query<'t>(?filter, ?orderby, ?orderbydesc, ?thenby, ?thenbydesc, ?take, ?skip) =
-            let res =
-                if typeof<'t> = typeof<Region> then
-                    [
-                        "Argentina"
-                        "Brazil"
-                        "Canada"
-                        "Denmark"
-                        "France"
-                    ]|>
-                    List.map(fun name -> 
-                    {
-                        RegionId = RegionId.CreateNew() 
-                        AlrernateNames = []
-                        RegionType = Country
-                        Name = name |> ShortString.TryCreate |> forceValidate
-                    })
-                    |> List.ofSeq |> box
+        member _.Query(?filter, ?orderby, ?orderbydesc, ?thenby, ?thenbydesc, ?take, ?skip) =
+            queryApi.Query(
+                ?filter = filter,
+                ?orderby = orderby,
+                ?orderbydesc = orderbydesc,
+                ?thenby = thenby,
+                ?thenbydesc = thenbydesc,
+                ?take = take,
+                ?skip = skip
+            )
 
-                else
-                    failwith "Not implemented"
-
-            async { return res :?> list<'t> }
     member _.Reset() = ()
 
-    member _.Init() = 
+    member _.Init() =
         DB.init config
+        queryApi <- (HolidayTracker.Query.API.api config null)

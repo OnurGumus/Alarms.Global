@@ -37,6 +37,9 @@ nuget FluentMigrator.Runner.SQLite
 nuget FluentMigrator.Runner
 nuget FluentMigrator
 nuget Microsoft.Data.SQLite
+nuget NodaTime
+nuget NodaTime.Serialization.JsonNet
+nuget SQLProvider
 
 group Client
     source https://api.nuget.org/v3/index.json
@@ -60,6 +63,7 @@ group Client
     nuget FSharp.Control.AsyncRx
     nuget Fable.Elmish.Browser
     nuget Elmish.Bridge.Client
+
 
 
 group Build
