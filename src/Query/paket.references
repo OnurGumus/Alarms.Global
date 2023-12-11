@@ -6,3 +6,6 @@ SQLProvider
 SQLitePCLRaw.core
 Microsoft.Extensions.Configuration
 Thoth.Json.Net
+Akkling.Persistence
+Akka.Persistence.Query.Sql
+Akka.Persistence.Sql

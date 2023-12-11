@@ -6,6 +6,10 @@ open Subscription
 open Thoth.Json.Net
 open HolidayTracker.ServerInterfaces.Query
 open Projection
+open Akka.Streams.Dsl
+open Akka.Persistence.Query
+open Akka.Streams
+open Akkling.Streams
 
 [<Interface>]
 type IAPI =
@@ -19,6 +23,12 @@ type IAPI =
         ?skip: int ->
             list<'t> Async
 
+    abstract Subscribe: (DataEvent -> unit) -> IKillSwitch
+let subscribeToStream source mat (sink:Sink<DataEvent,_>) =
+    source
+    |> Source.viaMat KillSwitch.single Keep.right
+    |> Source.toMat (sink) Keep.both
+    |> Graph.run mat
 
 open FSharp.Data.Sql.Common
 open Serilog
@@ -31,8 +41,22 @@ let api (config: IConfiguration) actorApi =
 
     let connString = config.GetSection(Constants.ConnectionString).Value
 
-    { new IAPI with
+    let source = Projection.init connString actorApi
 
+    subscribeToStream
+        source
+        actorApi.Materializer
+        (Sink.ForEach(fun x -> Serilog.Log.Verbose("data event : {@dataevent}", x)))
+    |> ignore
+
+    let subscribeCmd =
+        (fun (cb:DataEvent->unit) ->
+            let sink = Sink.forEach (fun event -> cb (event))
+            let ks, _ = subscribeToStream source actorApi.Materializer sink
+            ks :> IKillSwitch)
+
+    { new IAPI with
+        override this.Subscribe(cb) = subscribeCmd (cb)
         override this.Query(?filter, ?orderby, ?orderbydesc, ?thenby, ?thenbydesc, ?take, ?skip) : Async<'t list> =
             let ctx = Sql.GetDataContext(connString)
 

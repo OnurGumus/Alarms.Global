@@ -5,9 +5,10 @@ open HolidayTracker.ServerInterfaces.Query
 open HolidayTracker.Shared.Model
 
 [<System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage>]
-type AppEnv(config: IConfiguration) =
+type AppEnv(config: IConfiguration) as self =
 
     let mutable queryApi = Unchecked.defaultof<_>
+    let mutable commandApi = Unchecked.defaultof<_>
 
     interface IConfiguration with
         member _.Item
@@ -29,9 +30,12 @@ type AppEnv(config: IConfiguration) =
                 ?take = take,
                 ?skip = skip
             )
+        member _.Subscribe(cb) = queryApi.Subscribe(cb)
 
     member _.Reset() = ()
 
     member _.Init() =
         DB.init config
-        queryApi <- (HolidayTracker.Query.API.api config null)
+        commandApi <-
+            HolidayTracker.Command.API.api self NodaTime.SystemClock.Instance
+        queryApi <- (HolidayTracker.Query.API.api config commandApi.ActorApi)

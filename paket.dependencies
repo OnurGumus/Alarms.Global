@@ -41,7 +41,6 @@ nuget Akkling.Persistence
 nuget Akkling.Cluster.Sharding
 nuget Akka.Cluster.Sharding
 nuget Akka.Cluster.Tools
-nuget Akka.Logger.Serilog
 nuget Akka.Persistence.Sql
 nuget Akka.Logger.Serilog
 nuget Akka.Persistence.Query.Sql

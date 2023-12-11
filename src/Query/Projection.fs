@@ -41,8 +41,6 @@ type Sql =
 let ctx = Sql.GetDataContext(connectionString)
 QueryEvents.SqlQueryEvent |> Event.add (fun query -> Log.Debug ("Executing SQL {query}:", query))
 
-let individuals = ctx.Main.Regions.Individuals.``Region_0809e16b-9904-4200-a31d-5e88c3875e59``
-printf "%A" individuals
 let conn = ctx.CreateConnection()
 conn.Open()
 let cmd = conn.CreateCommand() 
@@ -58,3 +56,49 @@ let inline decode<'T> =
     Decode.Auto.generateDecoderCached<'T> (caseStrategy = CamelCase, extra = extraThoth)
     |> Decode.fromString
 
+open Command.Actor
+open Akka.Persistence.Query
+open Akka.Persistence.Query.Sql
+open FSharp.Data.Sql.Common
+open Akka.Streams
+open Akkling.Streams
+open System.Threading
+let handleEventWrapper (connectionString: string) (actorApi:IActor) (subQueue: ISourceQueue<_>) (envelop: EventEnvelope) =
+    try
+       failwith "not implemented"
+    with ex ->
+        Log.Error(ex, "Error during event handling")
+        actorApi.System.Terminate().Wait()
+        Log.CloseAndFlush()
+        System.Environment.Exit(-1)
+
+let readJournal system =
+    PersistenceQuery
+        .Get(system)
+        .ReadJournalFor<Akka.Persistence.Sql.Query.SqlReadJournal>(SqlReadJournal.Identifier)
+
+let init (connectionString: string) (actorApi: IActor) =
+    Log.Information("init query side")
+    let offsetCount = 0
+    
+    let source =
+        (readJournal actorApi.System).AllEvents(Offset.Sequence(offsetCount))
+    
+    Log.Information("Journal started")
+    let subQueue = Source.queue OverflowStrategy.Fail 1024
+    let subSink = (Sink.broadcastHub 1024)
+
+    let runnableGraph = subQueue |> Source.toMat subSink Keep.both
+
+    let queue, subRunnable = runnableGraph |> Graph.run (actorApi.Materializer)
+    source
+    |> Source.recover (fun ex ->
+        Log.Error(ex, "Error during event reading pipeline")
+        None)
+    |> Source.runForEach actorApi.Materializer (handleEventWrapper connectionString actorApi queue)
+    |> Async.StartAsTask
+    |> ignore
+    
+    System.Threading.Thread.Sleep(1000)
+    Log.Information("Projection init finished")
+    subRunnable
