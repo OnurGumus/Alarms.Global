@@ -1,7 +1,6 @@
 FSharp.Core
 Serilog
 NodaTime
-NodaTime.Serialization.JsonNet
 Microsoft.Data.SQLite
 SQLProvider
 SQLitePCLRaw.core

@@ -22,8 +22,6 @@ nuget Serilog.Sinks.Async
 nuget Giraffe.SerilogExtensions
 nuget FsToolkit.ErrorHandling
 nuget FsConfig
-nuget Akka.Logger.Serilog
-nuget Akka.Persistence.Query.Sql
 nuget Serilog.Expressions
 nuget Serilog.AspNetCore
 nuget SQLitePCLRaw.bundle_green
@@ -38,8 +36,16 @@ nuget FluentMigrator.Runner
 nuget FluentMigrator
 nuget Microsoft.Data.SQLite
 nuget NodaTime
-nuget NodaTime.Serialization.JsonNet
 nuget SQLProvider
+nuget Akkling.Persistence
+nuget Akkling.Cluster.Sharding
+nuget Akka.Cluster.Sharding
+nuget Akka.Cluster.Tools
+nuget Akka.Logger.Serilog
+nuget Akka.Persistence.Sql
+nuget Akka.Logger.Serilog
+nuget Akka.Persistence.Query.Sql
+nuget Akkling.Streams
 
 group Client
     source https://api.nuget.org/v3/index.json
@@ -63,8 +69,6 @@ group Client
     nuget FSharp.Control.AsyncRx
     nuget Fable.Elmish.Browser
     nuget Elmish.Bridge.Client
-
-
 
 group Build
     source https://api.nuget.org/v3/index.json
