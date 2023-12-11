@@ -3,6 +3,8 @@ module HolidayTracker.Server.Environments
 open Microsoft.Extensions.Configuration
 open HolidayTracker.ServerInterfaces.Query
 open HolidayTracker.Shared.Model
+open HolidayTracker.Shared.Model.Authentication
+open HolidayTracker.ServerInterfaces.Command
 
 [<System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage>]
 type AppEnv(config: IConfiguration) as self =
@@ -18,6 +20,10 @@ type AppEnv(config: IConfiguration) as self =
         member _.GetChildren() = config.GetChildren()
         member _.GetReloadToken() = config.GetReloadToken()
         member _.GetSection key = config.GetSection(key)
+
+    interface IAuthentication with
+            member _.IdentifyUser = 
+                commandApi.IdentifyUser
 
     interface IQuery with
         member _.Query(?filter, ?orderby, ?orderbydesc, ?thenby, ?thenbydesc, ?take, ?skip) =

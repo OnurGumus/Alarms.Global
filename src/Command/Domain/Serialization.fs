@@ -10,7 +10,7 @@ open Thoth.Json.Net
 open System.Runtime.Serialization
 open Serilog
 open System
-//open HolidayTracker.Command.Domain
+open HolidayTracker.Command.Domain
 
 module DefaultEncode =
     let instant (instant: Instant) =
@@ -26,6 +26,19 @@ let extraThoth =
     |> Extra.withDecimal
     |> Extra.withCustom (DefaultEncode.instant) DefeaultDecode.instant
 
+let userIdentityMessageEncode =
+    Encode.Auto.generateEncoder<Common.Event<UserIdentity.Event>> (extra = extraThoth)
+
+let userIdentityMessageDecode =
+    Decode.Auto.generateDecoder<Common.Event<UserIdentity.Event>> (extra = extraThoth)
+
+/// State encoding
+let userIdentityStateEncode =
+    Encode.Auto.generateEncoder<UserIdentity.State> (extra = extraThoth)
+
+let userIdentityStateDecode =
+    Decode.Auto.generateDecoder<UserIdentity.State> (extra = extraThoth)
+
 
 type ThothSerializer(system: ExtendedActorSystem) =
     inherit SerializerWithStringManifest(system)
@@ -35,6 +48,8 @@ type ThothSerializer(system: ExtendedActorSystem) =
     override _.ToBinary(o) =
 
         match o with
+        | :? Common.Event<UserIdentity.Event> as mesg -> mesg |> userIdentityMessageEncode
+        | :? UserIdentity.State as mesg -> mesg |> userIdentityStateEncode
 
         | e ->
             Log.Fatal("shouldn't happen {e}", e)
@@ -45,6 +60,8 @@ type ThothSerializer(system: ExtendedActorSystem) =
 
     override _.Manifest(o: obj) : string =
         match o with
+        | :? Common.Event<UserIdentity.Event> -> "UserIdentityMessage"
+        | :? UserIdentity.State -> "UserIdentityState"
         | _ -> o.GetType().FullName
 
     override _.FromBinary(bytes: byte[], manifest: string) : obj =
@@ -56,6 +73,8 @@ type ThothSerializer(system: ExtendedActorSystem) =
                 | Error er -> raise (new SerializationException(er))
 
         match manifest with
+        | "UserIdentityState" -> upcast decode userIdentityStateDecode
+        | "UserIdentityMessage" -> upcast decode userIdentityMessageDecode
 
         | _ ->
             Log.Fatal("manifest {manifest} not found", manifest)

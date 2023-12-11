@@ -40,6 +40,7 @@ open Google.Apis.Auth
 open Google.Apis.Auth.OAuth2
 open Serilog
 open HolidayTracker.Shared.Model
+open HolidayTracker.ServerInterfaces.Command
 
 let signOut (env: #_) : HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
@@ -52,7 +53,7 @@ let signOut (env: #_) : HttpHandler =
             return! setStatusCode 303 earlyReturn ctx
         }
 
-let googleSignIn (env: #_) : HttpHandler =
+let googleSignIn (env: _) : HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
         task {
             Log.Information("google login start")
@@ -67,6 +68,10 @@ let googleSignIn (env: #_) : HttpHandler =
                 let email = payload.Email
                 let name = payload.Name
                 let userId = email |> UserClientId.TryCreate |> forceValidate
+
+                let auth = env :> IAuthentication
+                let! res = auth.IdentifyUser userId
+                Log.Debug("Identification {@res}", res)
 
                 let p = prepareClaimsPrincipal userId.Value config
                 let authProps = AuthenticationProperties()

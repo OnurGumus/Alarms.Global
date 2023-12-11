@@ -123,7 +123,7 @@ module Authentication =
         member this.Value = let (UserIdentity uid) = this in uid
 
         static member CreateNew() =
-            "UserIdentity" + Guid.NewGuid().ToString()
+            "UserIdentity_" + Guid.NewGuid().ToString()
             |> ShortString.TryCreate
             |> forceValidate
             |> UserIdentity
