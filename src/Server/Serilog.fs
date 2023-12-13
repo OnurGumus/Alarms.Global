@@ -16,6 +16,8 @@ open Serilog.Sinks.SystemConsole.Themes
 let bootstrapLogger () =
     Log.Logger <-
         LoggerConfiguration()
+            .MinimumLevel
+            .Debug()
             .WriteTo.Console(theme= AnsiConsoleTheme.Literate, applyThemeToRedirectedOutput= true)
             .WriteTo.File(
                 new CompactJsonFormatter(),
