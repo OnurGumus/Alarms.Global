@@ -57,3 +57,5 @@ src/Client/Client.csproj
 src/Server/Database/Test.db
 src/Server/Database/HolidayTracker.db-shm
 src/Server/Database/HolidayTracker.db-wal
+src/Server/Database/Test.db-shm
+src/Server/Database/Test.db-wal

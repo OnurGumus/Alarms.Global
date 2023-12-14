@@ -31,23 +31,13 @@ let connectionString = @"Data Source=" + @"Database/HolidayTracker.db;"
 
 #endif
 
-[<Literal>]
-let connectionStringReal = @"Data Source=" + @"Database/HolidayTracker.db;"
 
 type Sql =
     SqlDataProvider<DatabaseProviderTypes.SQLITE, SQLiteLibrary=SQLiteLibrary.MicrosoftDataSqlite, ConnectionString=connectionString, ResolutionPath=resolutionPath, ContextSchemaPath=schemaLocation, CaseSensitivityChange=CaseSensitivityChange.ORIGINAL>
 
-let ctx = Sql.GetDataContext(connectionString)
-
 QueryEvents.SqlQueryEvent
 |> Event.add (fun query -> Log.Debug("Executing SQL {query}:", query))
 
-let conn = ctx.CreateConnection()
-conn.Open()
-let cmd = conn.CreateCommand()
-cmd.CommandText <- "PRAGMA journal_mode=WAL;"
-cmd.ExecuteNonQuery() |> ignore
-conn.Dispose() |> ignore
 
 let inline encode<'T> =
     Encode.Auto.generateEncoderCached<'T> (caseStrategy = CamelCase, extra = extraThoth)
@@ -66,7 +56,7 @@ open Akkling.Streams
 open System.Threading
 
 let handleEventWrapper
-    (connectionString: string)
+    (ctx: Sql.dataContext)
     (actorApi: IActor)
     (subQueue: ISourceQueue<_>)
     (envelop: EventEnvelope)
@@ -111,6 +101,15 @@ let readJournal system =
 
 let init (connectionString: string) (actorApi: IActor) =
     Log.Information("init query side")
+    let ctx = Sql.GetDataContext(connectionString)
+
+    let conn = ctx.CreateConnection()
+    conn.Open()
+    let cmd = conn.CreateCommand()
+    cmd.CommandText <- "PRAGMA journal_mode=WAL;"
+    cmd.ExecuteNonQuery() |> ignore
+    conn.Dispose() |> ignore
+
     let offsetCount = ctx.Main.Offsets.Individuals.HolidayTracker.OffsetCount
 
     let source = (readJournal actorApi.System).AllEvents(Offset.Sequence(offsetCount))
@@ -127,7 +126,7 @@ let init (connectionString: string) (actorApi: IActor) =
     |> Source.recover (fun ex ->
         Log.Error(ex, "Error during event reading pipeline")
         None)
-    |> Source.runForEach actorApi.Materializer (handleEventWrapper connectionString actorApi queue)
+    |> Source.runForEach actorApi.Materializer (handleEventWrapper ctx actorApi queue)
     |> Async.StartAsTask
     |> ignore
 

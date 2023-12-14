@@ -159,13 +159,13 @@ let api (config: IConfiguration) actorApi =
 
             let res =
                 if typeof<'t> = typeof<Region> then
-                    let credit =
+                    let q =
                         query {
                             for c in ctx.Main.Regions do
                                 select c
                         }
 
-                    augment <@ credit @>
+                    augment <@ q @>
                     |> Seq.map (fun x ->
                         { RegionId = (ShortString.TryCreate x.RegionId) |> forceValidate |> RegionId
                           Name = x.Name |> ShortString.TryCreate |> forceValidate
@@ -175,6 +175,23 @@ let api (config: IConfiguration) actorApi =
                             | "Country" -> Country
                             | _ -> Country }
                         : Region)
+                    |> List.ofSeq
+                    |> box
+
+                elif typeof<'t> = typeof<User> then
+                    let q =
+                        query {
+                            for c in ctx.Main.UserIdentities do
+                                select c
+                        }
+
+                    augment <@ q @>
+                    |> Seq.map (fun x ->
+                        { ClientId = x.ClientId |> UserClientId.TryCreate |> forceValidate
+                          Identity = x.Identity |> UserIdentity.Create
+                          Version =  x.Version |> Version
+                        }
+                        : User)
                     |> List.ofSeq
                     |> box
                 else

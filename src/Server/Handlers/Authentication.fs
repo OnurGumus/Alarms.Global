@@ -16,15 +16,17 @@ open Microsoft.Extensions.Configuration
 open HolidayTracker.Shared.Model
 open System.IO
 open System.Collections.Generic
+open Serilog
 
-let prepareClaimsPrincipal name (config: IConfiguration) =
+let prepareClaimsPrincipal (name, identity) (config: IConfiguration) =
     let admins =
         config.GetSection("config:admins").AsEnumerable()
         |> Seq.map (fun x -> x.Value)
         |> Seq.filter (isNull >> not)
         |> Set.ofSeq
 
-    let claims = [ Claim(ClaimTypes.Name, name) ]
+    let claims = [ Claim(ClaimTypes.Name, name); Claim("UserIdentity", identity) ]
+    Log.Debug("Claims: {@claims}", claims)
 
     let claims =
         if admins |> Set.contains name then
@@ -35,12 +37,12 @@ let prepareClaimsPrincipal name (config: IConfiguration) =
     ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)
     |> ClaimsPrincipal
 
-
 open Google.Apis.Auth
 open Google.Apis.Auth.OAuth2
 open Serilog
 open HolidayTracker.Shared.Model
 open HolidayTracker.ServerInterfaces.Command
+open HolidayTracker.ServerInterfaces.Query
 
 let signOut (env: #_) : HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
@@ -52,6 +54,50 @@ let signOut (env: #_) : HttpHandler =
             ctx.SetHttpHeader("Location", "/")
             return! setStatusCode 303 earlyReturn ctx
         }
+
+let retry f =
+    let rec retryInner attempt =
+        async {
+            if (attempt > 128) then
+                return None
+            else
+                match! f () with
+                | Some res -> return Some res
+                | _ ->
+                    do! Async.Sleep(100 * attempt)
+                    return! retryInner (attempt * 2)
+        }
+
+    retryInner 1
+
+let getUserIdentity (env: _) (userId: UserClientId) =
+    async {
+        let query = env :> IQuery
+
+        let getUser () = async{
+            let! user = 
+                query.Query<User>(filter = Predicate.Equal("ClientId", userId.Value), take = 1)
+            return user |> Seq.tryHead
+        }
+
+        let! user = getUser()
+
+        let! userIdentity =
+            match user with
+            | None ->
+                let auth = env :> IAuthentication
+
+                async {
+                    let! res = auth.IdentifyUser userId
+                    Log.Debug("Identification {@res}", res)
+                    let! user = retry getUser
+                    if user.IsNone then return failwith "User can't be polled in DB"
+                    return user.Value
+                }
+            | Some user -> async { return user }
+
+        return userIdentity
+    }
 
 let googleSignIn (env: _) : HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->
@@ -69,11 +115,11 @@ let googleSignIn (env: _) : HttpHandler =
                 let name = payload.Name
                 let userId = email |> UserClientId.TryCreate |> forceValidate
 
-                let auth = env :> IAuthentication
-                let! res = auth.IdentifyUser userId
-                Log.Debug("Identification {@res}", res)
+                let! userIdentity = getUserIdentity env userId
 
-                let p = prepareClaimsPrincipal userId.Value config
+                let p =
+                    prepareClaimsPrincipal (userId.Value, userIdentity.Identity.Value.Value) config
+
                 let authProps = AuthenticationProperties()
                 authProps.IsPersistent <- true
                 do! ctx.SignInAsync(p, authProps) |> Async.AwaitTask
@@ -93,11 +139,8 @@ let testSignIn (env: #_) : HttpHandler =
             let config = env :> IConfiguration
             let email = testUser
             let userId = email |> UserClientId.TryCreate |> forceValidate
-            let auth = env :> IAuthentication
-            let! res = auth.IdentifyUser userId
-            Log.Debug("Identification {@res}", res)
-
-            let p = prepareClaimsPrincipal userId.Value config
+            let! userIdentity = getUserIdentity env userId
+            let p = prepareClaimsPrincipal (userId.Value, userIdentity.Identity.Value.Value) config
             let authProps = AuthenticationProperties()
             authProps.IsPersistent <- true
             do! ctx.SignInAsync(p, authProps) |> Async.AwaitTask
