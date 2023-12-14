@@ -57,9 +57,9 @@ let view (host: HTMLElement) (model: Model) dispatch =
                 let ck = target.``checked``
 
                 if (ck) then
-                    (Server.api.Subscribe id) |> Async.Ignore |> Async.StartImmediate
+                    (Server.api.Subscribe None id) |> Async.Ignore |> Async.StartImmediate
                 else
-                    (Server.api.Unsubscribe id) |> Async.Ignore |> Async.StartImmediate
+                    (Server.api.Unsubscribe None id) |> Async.Ignore |> Async.StartImmediate
 
         let countrySelectors: seq<HTMLElement> =
             !! host.querySelectorAll(".country-selector")

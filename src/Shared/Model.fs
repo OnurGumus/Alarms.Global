@@ -192,5 +192,5 @@ module Subscription =
           Name: ShortString }
 
     type UserSubscription =
-        { UserClientId: Authentication.UserClientId
+        { Identity: Authentication.UserIdentity
           RegionId: RegionId }

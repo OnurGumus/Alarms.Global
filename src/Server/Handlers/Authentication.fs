@@ -17,6 +17,7 @@ open HolidayTracker.Shared.Model
 open System.IO
 open System.Collections.Generic
 open Serilog
+open HolidayTracker.Shared
 
 let prepareClaimsPrincipal (name, identity) (config: IConfiguration) =
     let admins =
@@ -25,7 +26,7 @@ let prepareClaimsPrincipal (name, identity) (config: IConfiguration) =
         |> Seq.filter (isNull >> not)
         |> Set.ofSeq
 
-    let claims = [ Claim(ClaimTypes.Name, name); Claim("UserIdentity", identity) ]
+    let claims = [ Claim(ClaimTypes.Name, name); Claim(Constants.UserIdentity, identity) ]
     Log.Debug("Claims: {@claims}", claims)
 
     let claims =

@@ -25,6 +25,7 @@ type IDomain =
     abstract ActorApi: IActor
     abstract Clock: IClock
     abstract UserIdentityFactory: string -> IEntityRef<obj>
+    abstract UserFactory: string -> IEntityRef<obj>
 
 let api (env: _) (clock: IClock) (actorApi: IActor) =
     let toEvent ci = Common.toEvent clock ci
@@ -34,11 +35,18 @@ let api (env: _) (clock: IClock) (actorApi: IActor) =
     |> sprintf "UserIdentity initialized: %A"
     |> Log.Debug
 
+    User.init env toEvent actorApi
+    |> sprintf "User initialized: %A"
+    |> Log.Debug
+
     System.Threading.Thread.Sleep(1000)
 
     { new IDomain with
         member _.Clock = clock
         member _.ActorApi = actorApi
+
+        member _.UserFactory entityId =
+            User.factory env toEvent actorApi entityId
 
         member _.UserIdentityFactory entityId =
             UserIdentity.factory env toEvent actorApi entityId }

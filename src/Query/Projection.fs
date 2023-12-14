@@ -55,12 +55,7 @@ open Akka.Streams
 open Akkling.Streams
 open System.Threading
 
-let handleEventWrapper
-    (ctx: Sql.dataContext)
-    (actorApi: IActor)
-    (subQueue: ISourceQueue<_>)
-    (envelop: EventEnvelope)
-    =
+let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISourceQueue<_>) (envelop: EventEnvelope) =
     try
         Log.Debug("Envelop:{@envelop}", envelop)
         let offsetValue = (envelop.Offset :?> Sequence).Value
@@ -78,6 +73,17 @@ let handleEventWrapper
 
                     row.Identity <- user.Identity.Value.Value
                     Some(IdentificationEvent(IdentificationSucceded user))
+            | :? Command.Common.Event<Command.Domain.User.Event> as { EventDetails = eventDetails
+                                                                      Version = v } ->
+                match eventDetails with
+                | Command.Domain.User.AlreadySubscribed _ -> None
+                | Command.Domain.User.Subscribed user ->
+                    ()
+                    //let row = ctx.Main.UserIdentities.``Create(ClientId, Version)`` (user.ClientId.Value, user.Version.Value)
+
+                    //row.Identity <- user.Identity.Value.Value
+                    Some(SubscriptionEvent(Subscribed user))
+
             | _ -> None
 
         let offset = ctx.Main.Offsets.Individuals.HolidayTracker

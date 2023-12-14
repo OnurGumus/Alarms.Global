@@ -22,8 +22,12 @@ type AppEnv(config: IConfiguration) as self =
         member _.GetSection key = config.GetSection(key)
 
     interface IAuthentication with
-            member _.IdentifyUser = 
-                commandApi.IdentifyUser
+        member _.IdentifyUser = commandApi.IdentifyUser
+
+    interface ISubscription with
+        member _.Subscribe = commandApi.Subscribe
+
+        member _.Unsubscribe = commandApi.Unsubscribe
 
     interface IQuery with
         member _.Query(?filter, ?orderby, ?orderbydesc, ?thenby, ?thenbydesc, ?take, ?skip) =
@@ -36,12 +40,12 @@ type AppEnv(config: IConfiguration) as self =
                 ?take = take,
                 ?skip = skip
             )
+
         member _.Subscribe(cb) = queryApi.Subscribe(cb)
 
     member _.Reset() = ()
 
     member _.Init() =
         DB.init config
-        commandApi <-
-            HolidayTracker.Command.API.api self NodaTime.SystemClock.Instance
+        commandApi <- HolidayTracker.Command.API.api self NodaTime.SystemClock.Instance
         queryApi <- (HolidayTracker.Query.API.api config commandApi.ActorApi)

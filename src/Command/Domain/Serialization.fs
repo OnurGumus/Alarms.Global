@@ -32,6 +32,12 @@ let userIdentityMessageEncode =
 let userIdentityMessageDecode =
     Decode.Auto.generateDecoder<Common.Event<UserIdentity.Event>> (extra = extraThoth)
 
+let userMessageEncode =
+    Encode.Auto.generateEncoder<Common.Event<User.Event>> (extra = extraThoth)
+
+let userMessageDecode =
+    Decode.Auto.generateDecoder<Common.Event<User.Event>> (extra = extraThoth)
+
 /// State encoding
 let userIdentityStateEncode =
     Encode.Auto.generateEncoder<UserIdentity.State> (extra = extraThoth)
@@ -39,6 +45,10 @@ let userIdentityStateEncode =
 let userIdentityStateDecode =
     Decode.Auto.generateDecoder<UserIdentity.State> (extra = extraThoth)
 
+
+let userStateEncode = Encode.Auto.generateEncoder<User.State> (extra = extraThoth)
+
+let userStateDecode = Decode.Auto.generateDecoder<User.State> (extra = extraThoth)
 
 type ThothSerializer(system: ExtendedActorSystem) =
     inherit SerializerWithStringManifest(system)
@@ -50,6 +60,8 @@ type ThothSerializer(system: ExtendedActorSystem) =
         match o with
         | :? Common.Event<UserIdentity.Event> as mesg -> mesg |> userIdentityMessageEncode
         | :? UserIdentity.State as mesg -> mesg |> userIdentityStateEncode
+        | :? Common.Event<User.Event> as mesg -> mesg |> userMessageEncode
+        | :? User.State as mesg -> mesg |> userStateEncode
 
         | e ->
             Log.Fatal("shouldn't happen {e}", e)
@@ -62,6 +74,8 @@ type ThothSerializer(system: ExtendedActorSystem) =
         match o with
         | :? Common.Event<UserIdentity.Event> -> "UserIdentityMessage"
         | :? UserIdentity.State -> "UserIdentityState"
+        | :? Common.Event<User.Event> -> "UserMessage"
+        | :? User.State -> "UserState"
         | _ -> o.GetType().FullName
 
     override _.FromBinary(bytes: byte[], manifest: string) : obj =
@@ -75,6 +89,8 @@ type ThothSerializer(system: ExtendedActorSystem) =
         match manifest with
         | "UserIdentityState" -> upcast decode userIdentityStateDecode
         | "UserIdentityMessage" -> upcast decode userIdentityMessageDecode
+        | "UserState" -> upcast decode userStateDecode
+        | "UserMessage" -> upcast decode userMessageDecode
 
         | _ ->
             Log.Fatal("manifest {manifest} not found", manifest)

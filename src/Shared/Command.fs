@@ -8,5 +8,5 @@ module Authentication =
 
 module Subscription =
 
-    type Subscribe = RegionId -> Async<Result<Version, string list>>
-    type Unsubscribe = RegionId -> Async<Result<Version, string list>>
+    type Subscribe = UserIdentity option-> RegionId -> Async<Result<Version, string list>>
+    type Unsubscribe = UserIdentity option -> RegionId -> Async<Result<Version, string list>>

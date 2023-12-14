@@ -30,6 +30,55 @@ let createCommandSubscription (domainApi: IDomain) factory (id: string) command 
     let ex = Execute e
     ex |> domainApi.ActorApi.SubscribeForCommand
 
+module User =
+    open HolidayTracker.Shared.Model.Subscription
+
+    let subscribe (createSubs) : Subscribe =
+        fun (userIdentity) regionId ->
+            async {
+                Log.Debug("Inside subscribe {@userId}", userIdentity.Value.Value.Value)
+
+                let subscription: UserSubscription =
+                    { Identity = userIdentity.Value
+                      RegionId = regionId }
+
+                let! subscribe =
+                    createSubs (userIdentity.Value.Value.Value) (Domain.User.Command.Subscribe subscription) (function
+                        | Domain.User.Subscribed _
+                        | Domain.User.AlreadySubscribed _ -> true
+                        | _ -> false)
+
+                match subscribe with
+                | { EventDetails = Domain.User.Subscribed _
+                    Version = v }
+                | { EventDetails = Domain.User.AlreadySubscribed _
+                    Version = v } -> return Ok(Version v)
+                | other -> return failwithf "unexpected event %A" other
+            }
+
+    let unsubscribe (createSubs) : Subscribe =
+        fun userIdentity regionId ->
+            async {
+                Log.Debug("Inside unsubscribe {@userId}", userIdentity.Value.Value)
+
+                let subscription: UserSubscription =
+                    { Identity = userIdentity.Value
+                      RegionId = regionId }
+
+                let! subscribe =
+                    createSubs (userIdentity.Value.Value.Value) (Domain.User.Command.Unsubscribe subscription) (function
+                        | Domain.User.Unsubscribed _
+                        | Domain.User.AlreadyUnsubscribed _ -> true
+                        | _ -> false)
+
+                match subscribe with
+                | { EventDetails = Domain.User.Unsubscribed _
+                    Version = v }
+                | { EventDetails = Domain.User.AlreadyUnsubscribed _
+                    Version = v } -> return Ok(Version v)
+                | other -> return failwithf "unexpected event %A" other
+            }
+
 module UserIdentity =
     open HolidayTracker.Shared.Model.Authentication
 
@@ -38,14 +87,12 @@ module UserIdentity =
             async {
                 Log.Debug("Inside identifyUser {@userId}", userId)
 
-                let subscribA =
+                let! subscribe =
                     createSubs (userId.Value) (Domain.UserIdentity.Command.Identify userId) (function
                         | Domain.UserIdentity.AlreadyIdentified _
                         | Domain.UserIdentity.IdentificationSucceded _ -> true)
 
-                let! subscrib = subscribA
-
-                match subscrib with
+                match subscribe with
                 | { EventDetails = Domain.UserIdentity.IdentificationSucceded _
                     Version = v }
                 | { EventDetails = Domain.UserIdentity.AlreadyIdentified _
@@ -67,8 +114,10 @@ let api (env: _) (clock: IClock) =
     let userIdentitySubs =
         createCommandSubscription domainApi domainApi.UserIdentityFactory
 
+    let userSubs = createCommandSubscription domainApi domainApi.UserFactory
+
     { new IAPI with
-        member this.Subscribe: Subscribe = failwith "Not implemented"
-        member this.Unsubscribe: Unsubscribe = failwith "Not implemented"
+        member this.Subscribe: Subscribe = User.subscribe userSubs
+        member this.Unsubscribe: Unsubscribe = User.unsubscribe userSubs
         member this.IdentifyUser: IdentifyUser = UserIdentity.identifyUser userIdentitySubs
         member _.ActorApi = actorApi }

@@ -9,19 +9,33 @@ open HolidayTracker.ServerInterfaces.Query
 open HolidayTracker.Shared.Model
 open System.Collections.Generic
 open Serilog
+open HolidayTracker.ServerInterfaces.Command
+open HolidayTracker.Shared.Model.Authentication
 
 let subscriptionAPI (ctx: HttpContext) (env: _) : API.Subscription = {
     Subscribe =
-        fun region ->
+        fun _ region ->
             async {
                 Log.Information("{@User} has subscribed to {@Region}", ctx.User.Identity.Name, region)
-                return Ok(Model.Version 1)
+                let subs = env :> ISubscription
+
+                let identity =
+                    ctx.User.FindFirst(fun x -> x.Type = Constants.UserIdentity).Value
+                    |> UserIdentity.Create
+
+                return! subs.Subscribe (Some identity) region
             }
     Unsubscribe =
-        fun region ->
+        fun _ region ->
             async {
                 Log.Information("{@User} has unsubscribed to {@Region}", ctx.User.Identity.Name, region)
-                return Ok(Model.Version 1)
+                let subs = env :> ISubscription
+
+                let identity =
+                    ctx.User.FindFirst(fun x -> x.Type = Constants.UserIdentity).Value
+                    |> UserIdentity.Create
+
+                return! subs.Unsubscribe (Some identity) region
             }
 }
 
