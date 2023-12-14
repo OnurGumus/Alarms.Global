@@ -18,40 +18,38 @@ open Akka.Event
 open HolidayTracker.ServerInterfaces.Command
 
 
-type Command =
-    | Identify
+type Command = Identify of UserClientId
 
 type Event =
-    | IdentificationSucceded of UserIdentity
-    | AlreadyIdentified of UserIdentity
+    | IdentificationSucceded of User
+    | AlreadyIdentified of User
 
-type State = {
-    Identity: UserIdentity option
-    Version: int64
-} with
+type State =
+    { User: User option
+      Version: int64 }
+
     interface IDefaultTag
 
 
-let actorProp (env:_) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsourced<obj>) =
-    let config  = env :> IConfiguration
+let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsourced<obj>) =
+    let config = env :> IConfiguration
     let log = mailbox.UntypedContext.GetLogger()
     let mediatorS = retype mediator
     let sendToSagaStarter = SagaStarter.toSendMessage mediatorS mailbox.Self
+
     let rec set (state: State) =
 
-        let apply (event: Event) (state:State) =
+        let apply (event: Event) (state: State) =
             log.Debug("Apply Message {@Event}, State: @{State}", event, state)
+
             match event with
-            | IdentificationSucceded identity->
-                {
-                    state with
-                        Identity = Some identity
-                }
+            | IdentificationSucceded user -> { state with User = Some user }
             | _ -> state
-    
+
         actor {
             let! msg = mailbox.Receive()
             log.Debug("Message {MSG}, State: {@State}", box msg, state)
+
             match msg with
             | PersistentLifecycleEvent _
             | :? Persistence.SaveSnapshotSuccess
@@ -59,27 +57,24 @@ let actorProp (env:_) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsour
 
             | SnapshotOffer(snapState: obj) -> return! snapState |> unbox<_> |> set
 
-                // actor level events will come here
+            // actor level events will come here
             | Persisted mailbox (:? Common.Event<Event> as event) ->
                 let version = event.Version
                 SagaStarter.publishEvent mailbox mediator event event.CorrelationId
 
-                let state = {
-                    (apply event.EventDetails state) with
-                        Version = version
-                }
+                let state =
+                    { (apply event.EventDetails state) with
+                        Version = version }
 
                 if (version >= 30L && version % 30L = 0L) then
                     return! state |> set <@> SaveSnapshot(state)
                 else
                     return! state |> set
-                    
+
             | Recovering mailbox (:? Common.Event<Event> as event) ->
                 return!
-                    {
-                        (apply event.EventDetails state) with
-                            Version = event.Version
-                    }
+                    { (apply event.EventDetails state) with
+                        Version = event.Version }
                     |> set
 
             | _ ->
@@ -92,26 +87,30 @@ let actorProp (env:_) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsour
                     let v = state.Version
 
                     match commandDetails with
-                    | Identify ->
-                        let identityEvent,v =
-                            match state.Identity with
-                            | Some identity -> AlreadyIdentified identity, v
+                    | Identify userClientId ->
+                        let identityEvent, v =
+                            match state.User with
+                            | Some user -> AlreadyIdentified user, v
                             | _ ->
                                 let newIdentity = UserIdentity.CreateNew()
-                                IdentificationSucceded newIdentity, (v + 1L)
+
+                                IdentificationSucceded
+                                    { ClientId = userClientId
+                                      Identity = newIdentity
+                                      Version = Version(v + 1L) },
+                                (v + 1L)
 
                         let identificationOutcome =
                             toEvent ci v identityEvent |> sendToSagaStarter ci |> box |> Persist
+
                         return! identificationOutcome
 
                 | _ ->
-                        log.Debug("Unhandled Message {@MSG}", box msg)
-                        return Unhandled
+                    log.Debug("Unhandled Message {@MSG}", box msg)
+                    return Unhandled
         }
-    set {
-        Version = 0L
-        Identity = None
-    }
+
+    set { Version = 0L; User = None }
 
 let init (env: _) toEvent (actorApi: IActor) =
     AkklingHelpers.entityFactoryFor actorApi.System shardResolver "UserIdentity"

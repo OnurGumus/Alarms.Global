@@ -112,6 +112,26 @@ type AddOffsetsTable() =
 
     override this.Down() = this.Delete.Table("Offsets") |> ignore
 
+[<MigrationAttribute(2023_12_13_2207L)>]
+type AddUserIdentityTable() =
+    inherit Migration()
+
+    override this.Up() =
+        this.Create
+            .Table("UserIdentities")
+            .WithColumn("Identity")
+            .AsString()
+            .PrimaryKey()
+            .WithColumn("ClientId")
+            .AsString()
+            .Indexed()
+            .WithColumn("Version")
+            .AsInt64()
+        |> ignore
+
+    override this.Down() =
+        this.Delete.Table("UserIdentities") |> ignore
+
 let updateDatabase (serviceProvider: IServiceProvider) =
     let runner = serviceProvider.GetRequiredService<IMigrationRunner>()
     runner.MigrateUp()

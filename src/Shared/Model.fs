@@ -137,7 +137,8 @@ module Authentication =
     type UserClientId = Email
 
     type User =
-        { UserClientId: UserClientId
+        { ClientId: UserClientId
+          Identity: UserIdentity
           Version: Version }
 
     type VerificationError =

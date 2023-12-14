@@ -39,7 +39,7 @@ module UserIdentity =
                 Log.Debug("Inside identifyUser {@userId}", userId)
 
                 let subscribA =
-                    createSubs (userId.Value) (Domain.UserIdentity.Identify) (function
+                    createSubs (userId.Value) (Domain.UserIdentity.Command.Identify userId) (function
                         | Domain.UserIdentity.AlreadyIdentified _
                         | Domain.UserIdentity.IdentificationSucceded _ -> true)
 

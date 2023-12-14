@@ -93,6 +93,9 @@ let testSignIn (env: #_) : HttpHandler =
             let config = env :> IConfiguration
             let email = testUser
             let userId = email |> UserClientId.TryCreate |> forceValidate
+            let auth = env :> IAuthentication
+            let! res = auth.IdentifyUser userId
+            Log.Debug("Identification {@res}", res)
 
             let p = prepareClaimsPrincipal userId.Value config
             let authProps = AuthenticationProperties()

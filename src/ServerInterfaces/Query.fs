@@ -1,15 +1,30 @@
 ﻿module HolidayTracker.ServerInterfaces.Query
+
 open HolidayTracker.Shared.Model.Subscription
 open HolidayTracker.Shared.Model
 open Akka.Streams
+open HolidayTracker.Shared.Model.Authentication
 
-type SubscriptionEvent = 
+type SubscriptionEvent =
     | Subscribed of UserSubscription
     | Unsubscribed of UserSubscription
 
-type DataEvent = SubscriptionEvent of SubscriptionEvent
+type IdentificationEvent = IdentificationSucceded of User
+
+type DataEvent =
+    | SubscriptionEvent of SubscriptionEvent
+    | IdentificationEvent of IdentificationEvent
 
 [<Interface>]
 type IQuery =
-    abstract Query<'t> : ?filter:Predicate * ?orderby:string * ?orderbydesc:string * ?thenby:string  * ?thenbydesc:string * ?take:int * ?skip:int -> list<'t> Async
-    abstract Subscribe:(DataEvent -> unit)->IKillSwitch
+    abstract Query<'t> :
+        ?filter: Predicate *
+        ?orderby: string *
+        ?orderbydesc: string *
+        ?thenby: string *
+        ?thenbydesc: string *
+        ?take: int *
+        ?skip: int ->
+            list<'t> Async
+
+    abstract Subscribe: (DataEvent -> unit) -> IKillSwitch
