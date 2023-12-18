@@ -55,8 +55,8 @@
 				"bierner.lit-html",
 				"ionide.ionide-paket",
 				"ionide.ionide-fake",
-				"BRBoer.vsc-conceal",
-				"fernandoescolar.vscode-solution-explorer",
+				//"BRBoer.vsc-conceal",
+				"fernandoescolar.vscode-solution-explorer"
 			]
 		}
 	},
