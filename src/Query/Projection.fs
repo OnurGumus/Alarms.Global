@@ -83,6 +83,7 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
 
                     //row.Identity <- user.Identity.Value.Value
                     Some(SubscriptionEvent(Subscribed user))
+                | _ -> None
 
             | _ -> None
 

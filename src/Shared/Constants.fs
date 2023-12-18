@@ -8,6 +8,10 @@ let UserIdentity = "UserIdentity"
 
 [<Literal>]
 let ConnectionString = "config:connection-string"
+
+[<Literal>]
+let DefaultReminderDays = "config:default-reminder-days"
+
 module Events =
     [<Literal>]
     let LOGGED_IN = "loggedIn"

@@ -17,6 +17,7 @@ open Akka.Logger.Serilog
 open Akka.Event
 open HolidayTracker.ServerInterfaces.Command
 open HolidayTracker.Shared.Model.Subscription
+open HolidayTracker.Shared
 
 
 type Command =
@@ -25,12 +26,14 @@ type Command =
 
 type Event =
     | Subscribed of UserSubscription
+    | RemindBeforeDaysSet of int
     | AlreadySubscribed of UserSubscription
     | Unsubscribed of UserSubscription
     | AlreadyUnsubscribed of UserSubscription
 
 type State =
     { Subscriptions: UserSubscription Set
+      RemindBeforeDays: int option
       Version: int64 }
 
     interface IDefaultTag
@@ -38,7 +41,9 @@ type State =
 
 let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsourced<obj>) =
     let config = env :> IConfiguration
+    let defaultReminderDays = config[Constants.DefaultReminderDays] |> int
     let log = mailbox.UntypedContext.GetLogger()
+
     let mediatorS = retype mediator
     let sendToSagaStarter = SagaStarter.toSendMessage mediatorS mailbox.Self
 
@@ -54,6 +59,9 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
             | Unsubscribed subs ->
                 { state with
                     Subscriptions = state.Subscriptions.Remove subs }
+            | RemindBeforeDaysSet days ->
+                { state with
+                    RemindBeforeDays = Some days }
             | _ -> state
 
         actor {
@@ -89,7 +97,13 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
 
             | _ ->
                 match msg with
-                | :? Persistence.RecoveryCompleted -> return! state |> set
+                | :? Persistence.RecoveryCompleted ->
+                    if state.RemindBeforeDays.IsNone then
+                        let event = RemindBeforeDaysSet defaultReminderDays
+                        let e = toEvent "" state.Version event |> box |> Persist
+                        return! (state |> set) <@> e
+                    else
+                        return! state |> set
 
                 | :? (Common.Command<Command>) as userMsg ->
                     let ci = userMsg.CorrelationId
@@ -124,6 +138,7 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
 
     set
         { Version = 0L
+          RemindBeforeDays = None
           Subscriptions = Set.empty }
 
 let init (env: _) toEvent (actorApi: IActor) =

@@ -1,7 +1,8 @@
 config{
       connection-string = "Data Source=DataBase/Test.db;"
+      default-reminder-days = 7
       akka {
-     persistence {
+          persistence {
           journal {
           plugin = "akka.persistence.journal.sql"
           sql {
