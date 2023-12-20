@@ -11,9 +11,12 @@ type SubscriptionEvent =
 
 type IdentificationEvent = IdentificationSucceded of User
 
+type UserSettingEvent = RemindBeforeDaysSet of UserIdentity * int
+
 type DataEvent =
     | SubscriptionEvent of SubscriptionEvent
     | IdentificationEvent of IdentificationEvent
+    | UserSettingEvent of UserSettingEvent
 
 [<Interface>]
 type IQuery =

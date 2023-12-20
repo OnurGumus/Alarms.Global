@@ -33,7 +33,7 @@ let connectionString = @"Data Source=" + @"Database/HolidayTracker.db;"
 
 
 type Sql =
-    SqlDataProvider<DatabaseProviderTypes.SQLITE, SQLiteLibrary=SQLiteLibrary.MicrosoftDataSqlite, ConnectionString=connectionString, ResolutionPath=resolutionPath, ContextSchemaPath=schemaLocation, CaseSensitivityChange=CaseSensitivityChange.ORIGINAL>
+    SqlDataProvider<DatabaseProviderTypes.SQLITE, ContextSchemaPath=schemaLocation, SQLiteLibrary=SQLiteLibrary.MicrosoftDataSqlite, ConnectionString=connectionString, ResolutionPath=resolutionPath, CaseSensitivityChange=CaseSensitivityChange.ORIGINAL>
 
 QueryEvents.SqlQueryEvent
 |> Event.add (fun query -> Log.Debug("Executing SQL {query}:", query))
@@ -76,14 +76,31 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
             | :? Command.Common.Event<Command.Domain.User.Event> as { EventDetails = eventDetails
                                                                       Version = v } ->
                 match eventDetails with
+                | Command.Domain.User.RemindBeforeDaysSet(identity, days) ->
+                    let row = ctx.Main.UserSettings.``Create(ReminderDays, Version)`` (days, v)
+                    row.Identity <- identity.Value.Value
+                    Some(UserSettingEvent(RemindBeforeDaysSet(identity, days)))
+                    
                 | Command.Domain.User.AlreadySubscribed _ -> None
-                | Command.Domain.User.Subscribed user ->
-                    ()
-                    //let row = ctx.Main.UserIdentities.``Create(ClientId, Version)`` (user.ClientId.Value, user.Version.Value)
+                | Command.Domain.User.Subscribed subs ->
+                    let row = ctx.Main.Subscriptions.Create()
+                    row.Identity <- subs.Identity.Value.Value
+                    row.RegionId <- subs.RegionId.Value.Value
+                    Some(SubscriptionEvent(Subscribed subs))
 
-                    //row.Identity <- user.Identity.Value.Value
-                    Some(SubscriptionEvent(Subscribed user))
-                | _ -> None
+                | Command.Domain.User.AlreadyUnsubscribed _ -> None
+                | Command.Domain.User.Unsubscribed subs ->
+                    let row =
+                        query {
+                            for c in (ctx.Main.Subscriptions) do
+                                where (c.Identity = subs.Identity.Value.Value)
+                                take 1
+                                select c
+                        }
+                        |> Seq.head
+
+                    row.Delete()
+                    Some(SubscriptionEvent(Unsubscribed subs))
 
             | _ -> None
 

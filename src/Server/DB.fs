@@ -132,6 +132,44 @@ type AddUserIdentityTable() =
     override this.Down() =
         this.Delete.Table("UserIdentities") |> ignore
 
+
+[<MigrationAttribute(2023_12_20_1553L)>]
+type AddUserSubscriptionsTable() =
+    inherit Migration()
+
+    override this.Up() =
+        this.Create
+            .Table("Subscriptions")
+            .WithColumn("Identity")
+            .AsString()
+            .PrimaryKey()
+            .WithColumn("RegionId")
+            .AsString()
+            .PrimaryKey()
+        |> ignore
+
+    override this.Down() =
+        this.Delete.Table("Subscriptions") |> ignore
+
+
+[<MigrationAttribute(2023_12_20_1554L)>]
+type AddUserSettingsTable() =
+    inherit Migration()
+
+    override this.Up() =
+        this.Create
+            .Table("UserSettings")
+            .WithColumn("Identity")
+            .AsString()
+            .PrimaryKey()
+            .WithColumn("ReminderDays")
+            .AsInt32()
+            .WithColumn("Version")
+            .AsInt64()
+        |> ignore
+
+    override this.Down() =
+        this.Delete.Table("UserSettings") |> ignore
 let updateDatabase (serviceProvider: IServiceProvider) =
     let runner = serviceProvider.GetRequiredService<IMigrationRunner>()
     runner.MigrateUp()
