@@ -24,7 +24,8 @@ type IAPI =
             list<'t> Async
 
     abstract Subscribe: (DataEvent -> unit) -> IKillSwitch
-let subscribeToStream source mat (sink:Sink<DataEvent,_>) =
+
+let subscribeToStream source mat (sink: Sink<DataEvent, _>) =
     source
     |> Source.viaMat KillSwitch.single Keep.right
     |> Source.toMat (sink) Keep.both
@@ -50,13 +51,14 @@ let api (config: IConfiguration) actorApi =
     |> ignore
 
     let subscribeCmd =
-        (fun (cb:DataEvent->unit) ->
+        (fun (cb: DataEvent -> unit) ->
             let sink = Sink.forEach (fun event -> cb (event))
             let ks, _ = subscribeToStream source actorApi.Materializer sink
             ks :> IKillSwitch)
 
     { new IAPI with
         override this.Subscribe(cb) = subscribeCmd (cb)
+
         override this.Query(?filter, ?orderby, ?orderbydesc, ?thenby, ?thenbydesc, ?take, ?skip) : Async<'t list> =
             let ctx = Sql.GetDataContext(connString)
 
@@ -189,9 +191,36 @@ let api (config: IConfiguration) actorApi =
                     |> Seq.map (fun x ->
                         { ClientId = x.ClientId |> UserClientId.TryCreate |> forceValidate
                           Identity = x.Identity |> UserIdentity.Create
-                          Version =  x.Version |> Version
-                        }
+                          Version = x.Version |> Version }
                         : User)
+                    |> List.ofSeq
+                    |> box
+                elif typeof<'t> = typeof<UserSubscription> then
+                    let q =
+                        query {
+                            for c in ctx.Main.Subscriptions do
+                                select c
+                        }
+
+                    augment <@ q @>
+                    |> Seq.map (fun x ->
+                        { Identity = x.Identity |> UserIdentity.Create
+                          RegionId = x.RegionId |> RegionId.Create }
+                        : UserSubscription)
+                    |> List.ofSeq
+                    |> box
+                elif typeof<'t> = typeof<UserSetting> then
+                    let q =
+                        query {
+                            for c in ctx.Main.UserSettings do
+                                select c
+                        }
+
+                    augment <@ q @>
+                    |> Seq.map (fun x ->
+                        { Identity = x.Identity |> UserIdentity.Create
+                          BeforeDays = x.ReminderDays |> int }
+                        : UserSetting)
                     |> List.ofSeq
                     |> box
                 else

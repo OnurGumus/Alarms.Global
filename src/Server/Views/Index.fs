@@ -7,12 +7,22 @@ open HolidayTracker.ServerInterfaces.Query
 open HolidayTracker.Shared.Model
 open System
 open Subscription
+open HolidayTracker.Shared
 
 let view (env: _) (ctx: HttpContext) (dataLevel: int) =
     task {
         let query = env :> IQuery
         let! countries = query.Query<Region>()
         let user = ctx.User.Identity.Name
+
+        let! subscriptions =
+            if ctx.User.Identity.IsAuthenticated then
+                let identity = ctx.User.FindFirst(fun x -> x.Type = Constants.UserIdentity).Value
+                query.Query<UserSubscription>(filter = Equal("Identity", identity))
+            else
+                async { return [] }
+
+        let regions = subscriptions |> List.map _.RegionId |> Set.ofList
 
         let countryNames =
             countries
@@ -26,6 +36,10 @@ let view (env: _) (ctx: HttpContext) (dataLevel: int) =
                             <input class="switch__input country-selector"
                                 data-id={country.RegionId.Value}
                                 data-name={country.Name.Value} 
+                                {if regions |> Set.contains country.RegionId then
+                                     "checked"
+                                 else
+                                     ""}
                                 type="checkbox" role="switch" name="switch1">
                             <span class="switch__fill" aria-hidden="true">
                                 <span class="switch__text">ON</span>

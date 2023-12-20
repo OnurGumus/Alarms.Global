@@ -80,7 +80,7 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
                     let row = ctx.Main.UserSettings.``Create(ReminderDays, Version)`` (days, v)
                     row.Identity <- identity.Value.Value
                     Some(UserSettingEvent(RemindBeforeDaysSet(identity, days)))
-                    
+
                 | Command.Domain.User.AlreadySubscribed _ -> None
                 | Command.Domain.User.Subscribed subs ->
                     let row = ctx.Main.Subscriptions.Create()
@@ -93,7 +93,7 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
                     let row =
                         query {
                             for c in (ctx.Main.Subscriptions) do
-                                where (c.Identity = subs.Identity.Value.Value)
+                                where (c.Identity = subs.Identity.Value.Value && c.RegionId = subs.RegionId.Value.Value)
                                 take 1
                                 select c
                         }

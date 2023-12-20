@@ -194,3 +194,7 @@ module Subscription =
     type UserSubscription =
         { Identity: Authentication.UserIdentity
           RegionId: RegionId }
+
+    type UserSetting =
+        { Identity: Authentication.UserIdentity
+          BeforeDays: int }
