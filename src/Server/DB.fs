@@ -38,8 +38,9 @@ type One() =
         try
             // clean up akka stuff
             this.Execute.Sql("DELETE FROM SNAPSHOT") |> ignore
-            this.Execute.Sql("DELETE FROM EVENT_JOURNAL") |> ignore
-            this.Execute.Sql("DELETE FROM JOURNAL_METADATA") |> ignore
+            this.Execute.Sql("DELETE FROM JOURNAL") |> ignore
+            this.Execute.Sql("DELETE FROM SQLITE_SEQUENCE") |> ignore
+            this.Execute.Sql("DELETE FROM TAGS") |> ignore
         with _ ->
             ()
 

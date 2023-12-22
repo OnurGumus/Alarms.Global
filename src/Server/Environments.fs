@@ -5,6 +5,8 @@ open HolidayTracker.ServerInterfaces.Query
 open HolidayTracker.Shared.Model
 open HolidayTracker.Shared.Model.Authentication
 open HolidayTracker.ServerInterfaces.Command
+open HolidayTracker.Command.API
+open Command.Actor
 
 [<System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage>]
 type AppEnv(config: IConfiguration) as self =
@@ -43,7 +45,12 @@ type AppEnv(config: IConfiguration) as self =
 
         member _.Subscribe(cb) = queryApi.Subscribe(cb)
 
-    member _.Reset() = ()
+    member this.Reset() =
+        DB.reset config
+        let commandApi: IAPI = commandApi
+        let system = commandApi.ActorApi.System
+        system.Terminate().Wait()
+        system.WhenTerminated.ContinueWith(fun _ -> this.Init()).Wait()
 
     member _.Init() =
         DB.init config
