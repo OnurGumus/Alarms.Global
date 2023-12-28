@@ -10,3 +10,4 @@ module Subscription =
 
     type Subscribe = UserIdentity option-> RegionId -> Async<Result<Version, string list>>
     type Unsubscribe = UserIdentity option -> RegionId -> Async<Result<Version, string list>>
+    type PublishEvent = GlobalEvent -> Async<Result<Version, string list>>

@@ -198,3 +198,9 @@ module Subscription =
     type UserSetting =
         { Identity: Authentication.UserIdentity
           BeforeDays: int }
+
+    type GlobalEvent =
+        { Title: ShortString
+          Body: LongString
+          EvetDateInUTC: DateTime option
+          TargetRegion: RegionId list }
