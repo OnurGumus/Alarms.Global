@@ -14,7 +14,8 @@ Feature: Subscribe
         When I try to select a country
         Then I should be subscribed to that country
 
-    # Scenario: Unsubscribe
-    #     Given I am subscribed to a country
-    #     When I unsubscribe
-    #     Then I should be unsubscribed
+    Scenario: Unsubscribe
+        Given I am authenticated
+        And I am subscribed to a country
+        When I unsubscribe from that country
+        Then I should be unsubscribed from that country

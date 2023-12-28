@@ -1,4 +1,4 @@
-module HolidayTracker.Automation.Subscribe
+module rec HolidayTracker.Automation.Subscribe
 
 open Microsoft.Playwright
 open TickSpec
@@ -19,6 +19,14 @@ let ``I am authenticated`` (context: IBrowserContext) =
 [<Given>]
 let ``I am not subscribed to a country`` (context: IBrowserContext) = (task { return () }).Result
 
+[<Given>]
+let ``I am subscribed to a country`` (page: IPage) =
+    (task {
+        ``I try to select a country`` (page)
+        let! _ = page.ReloadAsync()
+        return ()
+    })
+        .Result
 
 [<When>]
 let ``I try to select a country`` (page: IPage) =
@@ -32,6 +40,27 @@ let ``I try to select a country`` (page: IPage) =
                 async { return () }
             else
                 page.WaitForResponseAsync(fun u -> u.Url.Contains("/Subscribe"))
+                |> Async.AwaitTask
+                |> Async.Ignore
+
+        do! switch.ClickAsync()
+        do! res
+        return ()
+    })
+        .Wait()
+
+[<When>]
+let ``I unsubscribe from that country`` (page: IPage) =
+    (task {
+        let switch = page.GetByRole(AriaRole.Switch).First
+        do! page.WaitForLoadStateAsync()
+        let! cookies = page.Context.CookiesAsync()
+
+        let res =
+            if cookies |> Seq.isEmpty then
+                async { return () }
+            else
+                page.WaitForResponseAsync(fun u -> u.Url.Contains("/Unsubscribe"))
                 |> Async.AwaitTask
                 |> Async.Ignore
 
@@ -60,3 +89,12 @@ let ``I should be subscribed to that country`` (page: IPage) =
         do! Expect(firstSwitch).ToBeCheckedAsync()
     })
         .Result
+[<Then>]
+let ``I should be unsubscribed from that country`` (page: IPage) =
+    (task {
+        let! _ = page.ReloadAsync()
+        let firstSwitch = page.GetByRole(AriaRole.Switch).First
+        do! Expect(firstSwitch).ToBeCheckedAsync(LocatorAssertionsToBeCheckedOptions(Checked = false))
+    })
+        .Result
+
