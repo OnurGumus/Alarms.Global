@@ -10,6 +10,7 @@ let serverPath = Path.getFullName "./src/Server"
 let clientPath = Path.getFullName "./src/Client"
 let deployDir = Path.getFullName "./deploy"
 let automationPath = Path.getFullName "./test/Automation"
+let cqrsServerTestPath = Path.getFullName "./test/CQRS"
 
 let platformTool tool winTool =
     let tool = if Environment.isUnix then tool else winTool
@@ -89,6 +90,9 @@ let initTargets () =
         }
         |> Async.RunSynchronously
         |> ignore)
+
+    Target.create "RunCQRSTests" (fun _ -> runDotNet "test" cqrsServerTestPath)
+
 
     "Clean" ==> "InstallClient" ==> "Build" |> ignore
     "Clean" ==> "InstallClient" ==> "BuildClient" ==> "PublishServer" |> ignore
