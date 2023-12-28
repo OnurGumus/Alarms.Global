@@ -479,8 +479,6 @@ let env =
         member this.Item
             with get (key: string) = config.[key]
             and set (key: string) (v: string) = config.[key] <- v
-
-        
         }
 
 let commandApi = HolidayTracker.Command.API.api env NodaTime.SystemClock.Instance
@@ -489,5 +487,5 @@ bootstrapLogger ()
 
 let user = "onur@outlook.com.tr" |> UserClientId.TryCreate |> forceValidate
 printfn "Starting login for %A" commandApi
-let t = Async.StartImmediate(commandApi.IdentifyUser user |> Async.Ignore)
+let t = Async.StartImmediate(commandApi.IdentifyUser (CID.CreateNew()) user |> Async.Ignore)
 printfn "Login completed %A" (t)
