@@ -7,6 +7,7 @@
     <Compile Include="DB.fs" />
     <Compile Include="Projection.fs" />
     <Compile Include="API.fs" />
+    <Compile Include="Environments.fs" />
     <Content Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
