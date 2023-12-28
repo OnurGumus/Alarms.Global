@@ -45,6 +45,12 @@ nuget Akka.Persistence.Sql
 nuget Akka.Logger.Serilog
 nuget Akka.Persistence.Query.Sql
 nuget Akkling.Streams
+nuget YoloDev.Expecto.TestSdk 0.14.3
+nuget Microsoft.NET.Test.Sdk
+nuget altcover
+nuget FSCheck
+nuget Expecto
+nuget Expecto.FsCheck
 
 group Client
     source https://api.nuget.org/v3/index.json
@@ -68,6 +74,7 @@ group Client
     nuget FSharp.Control.AsyncRx
     nuget Fable.Elmish.Browser
     nuget Elmish.Bridge.Client
+
 
 group Build
     source https://api.nuget.org/v3/index.json

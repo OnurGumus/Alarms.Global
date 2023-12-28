@@ -9,3 +9,6 @@ Thoth.Json.Net
 Akkling.Persistence
 Akka.Persistence.Query.Sql
 Akka.Persistence.Sql
+FluentMigrator.Runner.SQLite
+FluentMigrator.Runner
+FluentMigrator

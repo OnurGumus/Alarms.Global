@@ -4,6 +4,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DB.fs" />
     <Compile Include="Projection.fs" />
     <Compile Include="API.fs" />
     <Content Include="paket.references" />
