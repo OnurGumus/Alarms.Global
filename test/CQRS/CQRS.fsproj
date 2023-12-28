@@ -1,12 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <GenerateProgramFile>false</GenerateProgramFile>
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GlobalEvent.fs" />
+    <Compile Include="ExpectoTickSpecHelper.fs" />
+    <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
     <Content Include="paket.references" />
+    <Content Include="./test-config.hocon">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="../../features/GlobalEvent.feature" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Query\Query.fsproj" />
+    <ProjectReference Include="..\..\src\Command\Command.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

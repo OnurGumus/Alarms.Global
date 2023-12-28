@@ -52,10 +52,7 @@ nCrunchTemp_*
 src/Server/WebRoot/dist/
 src/Client/vite.config.ts.timestamp*.mjs
 src/Shared/Shared.csproj
-src/Server/Database/HolidayTracker.db
 src/Client/Client.csproj
-src/Server/Database/Test.db
-src/Server/Database/HolidayTracker.db-shm
-src/Server/Database/HolidayTracker.db-wal
-src/Server/Database/Test.db-shm
-src/Server/Database/Test.db-wal
+*.db
+*.db-wal
+*.db-shm
