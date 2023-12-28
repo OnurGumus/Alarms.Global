@@ -17,19 +17,19 @@ let ``I am authenticated`` (context: IBrowserContext) =
         .Result
 
 [<Given>]
-let ``I am not subscribed to a country`` (context: IBrowserContext) = (task { return () }).Result
+let ``I am not subscribed to a region`` (context: IBrowserContext) = (task { return () }).Result
 
 [<Given>]
-let ``I am subscribed to a country`` (page: IPage) =
+let ``I am subscribed to a region`` (page: IPage) =
     (task {
-        ``I try to select a country`` (page)
+        ``I try to select a region`` (page)
         let! _ = page.ReloadAsync()
         return ()
     })
         .Result
 
 [<When>]
-let ``I try to select a country`` (page: IPage) =
+let ``I try to select a region`` (page: IPage) =
     (task {
         let switch = page.GetByRole(AriaRole.Switch).First
         do! page.WaitForLoadStateAsync()
@@ -50,7 +50,7 @@ let ``I try to select a country`` (page: IPage) =
         .Wait()
 
 [<When>]
-let ``I unsubscribe from that country`` (page: IPage) =
+let ``I unsubscribe from that region`` (page: IPage) =
     (task {
         let switch = page.GetByRole(AriaRole.Switch).First
         do! page.WaitForLoadStateAsync()
@@ -82,7 +82,7 @@ let ``system should require me to login`` (page: IPage) =
         .Wait()
 
 [<Then>]
-let ``I should be subscribed to that country`` (page: IPage) =
+let ``I should be subscribed to that region`` (page: IPage) =
     (task {
         let! _ = page.ReloadAsync()
         let firstSwitch = page.GetByRole(AriaRole.Switch).First
@@ -90,7 +90,7 @@ let ``I should be subscribed to that country`` (page: IPage) =
     })
         .Result
 [<Then>]
-let ``I should be unsubscribed from that country`` (page: IPage) =
+let ``I should be unsubscribed from that region`` (page: IPage) =
     (task {
         let! _ = page.ReloadAsync()
         let firstSwitch = page.GetByRole(AriaRole.Switch).First

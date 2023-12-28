@@ -5,17 +5,17 @@ Feature: Subscribe
 
     Scenario: Subscribe when not authenticated
         Given I am not authenticated
-        When I try to select a country
+        When I try to select a region
         Then system should require me to login
 
     Scenario: Subscribe when authenticated
         Given I am authenticated
-        And I am not subscribed to a country
-        When I try to select a country
-        Then I should be subscribed to that country
+        And I am not subscribed to a region
+        When I try to select a region
+        Then I should be subscribed to that region
 
     Scenario: Unsubscribe
         Given I am authenticated
-        And I am subscribed to a country
-        When I unsubscribe from that country
-        Then I should be unsubscribed from that country
+        And I am subscribed to a region
+        When I unsubscribe from that region
+        Then I should be unsubscribed from that region
