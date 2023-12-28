@@ -13,11 +13,11 @@ Feature: Subscribe
         When I try to select a country
         Then system should require me to login
 
-    # Scenario: Subscribe when authenticated
-    #     Given I am authenticated
-    #     And I am not subscribed to a country
-    #     When I try to select a country
-    #     Then I should be subscribed to that country
+    Scenario: Subscribe when authenticated
+        Given I am authenticated
+        And I am not subscribed to a country
+        When I try to select a country
+        Then I should be subscribed to that country
 
     # Scenario: Unsubscribe
     #     Given I am subscribed to a country

@@ -6,8 +6,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Setup.fs" />
-    <Compile Include="Subscribe.fs" />
     <Compile Include="Authenticate.fs" />
+    <Compile Include="Subscribe.fs" />
     <Compile Include="Program.fs" />
     <EmbeddedResource Include="../../features/Subscribe.feature" />
     <EmbeddedResource Include="../../features/Authenticate.feature" />

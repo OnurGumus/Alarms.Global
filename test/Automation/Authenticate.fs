@@ -5,6 +5,17 @@ open TickSpec
 open System.Threading.Tasks
 open type Microsoft.Playwright.Assertions
 
+
+[<Given>]
+let ``I am not authenticated`` (context: IBrowserContext) =
+    (task {
+        do! context.ClearCookiesAsync()
+        let! page = context.NewPageAsync()
+        let! _ = page.GotoAsync("http://localhost:5070?test-user")
+        return (page)
+    })
+        .Result
+
 [<When>]
 let ``I sign in`` (page: IPage) =
     (task {
@@ -22,7 +33,7 @@ let ``I should be signed in`` (page: IPage) =
 
 [<Given>]
 let ``I am signed in`` (context: IBrowserContext) =
-    let page = Subscribe.``I am not authenticated`` (context)
+    let page = ``I am not authenticated`` (context)
     ``I sign in`` (page)
     page
 
