@@ -81,7 +81,7 @@ let DEFAULT_SHARD = "default-shard"
 let SAGA_Suffix = "~Saga~"
 
 [<Literal>]
-let CID_Seperator = "~"
+let CID_Separator = "~"
 
 let shardResolver = fun _ -> DEFAULT_SHARD
 
@@ -94,21 +94,20 @@ module SagaStarter =
         if index > 0 then name.Substring(0, index) else name
 
     let toRawGuid (name: string) =
-        let index = name.LastIndexOf(CID_Seperator)
+        let index = name.LastIndexOf(CID_Separator)
         name.Substring(index + 1).Replace(SAGA_Suffix, "")
 
-    let toNewCid name =
-        name + CID_Seperator + Guid.NewGuid().ToString()
+    let toNewCid (cid: string) name = name + CID_Separator + cid
 
     let toCidWithExisting (name: string) (existing: string) =
         let originator = name
         let guid = existing |> toRawGuid
-        originator + CID_Seperator + guid
+        originator + CID_Separator + guid
 
     let toCid name =
         let originator = (name |> toOriginatorName)
         let guid = name |> toRawGuid
-        originator + CID_Seperator + guid
+        originator + CID_Separator + guid
 
     let cidToSagaName (name: string) = name + SAGA_Suffix
     let isSaga (name: string) = name.Contains(SAGA_Suffix)
@@ -155,7 +154,7 @@ module SagaStarter =
                 sender <! (event)
 
         mediator <! Publish(self.Path.Name, event)
-        mediator <! Publish(self.Path.Name + CID_Seperator + cid, event)
+        mediator <! Publish(self.Path.Name + CID_Separator + cid, event)
 
     let cont (mediator) =
         mediator <! box (Send(SagaStarterPath, Continue |> Command, true))
@@ -283,7 +282,7 @@ module CommandHandler =
                                 <! box (
                                     Subscribe(
                                         (cd.EntityRef.EntityId |> System.Uri.EscapeDataString)
-                                        + CID_Seperator
+                                        + CID_Separator
                                         + cd.Cmd.CorrelationId,
                                         untyped mailbox.Self
                                     )

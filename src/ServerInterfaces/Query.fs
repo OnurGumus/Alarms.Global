@@ -4,6 +4,7 @@ open HolidayTracker.Shared.Model.Subscription
 open HolidayTracker.Shared.Model
 open Akka.Streams
 open HolidayTracker.Shared.Model.Authentication
+open Command
 
 type SubscriptionEvent =
     | Subscribed of UserSubscription
@@ -13,10 +14,12 @@ type IdentificationEvent = IdentificationSucceded of User
 
 type UserSettingEvent = RemindBeforeDaysSet of UserIdentity * int
 
-type DataEvent =
+type DataEventType =
     | SubscriptionEvent of SubscriptionEvent
     | IdentificationEvent of IdentificationEvent
     | UserSettingEvent of UserSettingEvent
+
+type DataEvent = { Type: DataEventType; CID: CID }
 
 [<Interface>]
 type IQuery =
@@ -31,3 +34,4 @@ type IQuery =
             list<'t> Async
 
     abstract Subscribe: (DataEvent -> unit) -> IKillSwitch
+    abstract Subscribe: (DataEvent -> bool) * int * (DataEvent -> unit) -> IKillSwitch * Async<unit>

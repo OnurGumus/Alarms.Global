@@ -26,7 +26,7 @@ type Command =
 
 type Event =
     | Subscribed of UserSubscription
-    | RemindBeforeDaysSet of UserIdentity *  int
+    | RemindBeforeDaysSet of UserIdentity * int
     | AlreadySubscribed of UserSubscription
     | Unsubscribed of UserSubscription
     | AlreadyUnsubscribed of UserSubscription
@@ -59,7 +59,7 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
             | Unsubscribed subs ->
                 { state with
                     Subscriptions = state.Subscriptions.Remove subs }
-            | RemindBeforeDaysSet (_,days) ->
+            | RemindBeforeDaysSet(_, days) ->
                 { state with
                     RemindBeforeDays = Some days }
             | _ -> state
@@ -97,8 +97,7 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
 
             | _ ->
                 match msg with
-                | :? Persistence.RecoveryCompleted ->
-                        return! state |> set
+                | :? Persistence.RecoveryCompleted -> return! state |> set
 
                 | :? (Common.Command<Command>) as userMsg ->
                     let ci = userMsg.CorrelationId
@@ -107,7 +106,7 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
 
                     match commandDetails with
                     | Subscribe subs ->
-                    
+
                         let subscribeEvent, v =
                             if state.Subscriptions |> Set.contains subs then
                                 AlreadySubscribed subs, v
@@ -115,10 +114,10 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
                                 Subscribed subs, (v + 1L)
 
                         let outcome = toEvent ci v subscribeEvent |> sendToSagaStarter ci |> box |> Persist
-                        
+
                         if state.RemindBeforeDays.IsNone then
-                            let event = RemindBeforeDaysSet (subs.Identity, defaultReminderDays)
-                            let e = toEvent "" state.Version event |> box |> Persist
+                            let event = RemindBeforeDaysSet(subs.Identity, defaultReminderDays)
+                            let e = toEvent (Guid.NewGuid().ToString()) state.Version event |> box |> Persist
                             return! outcome <@> e
                         else
                             return! outcome

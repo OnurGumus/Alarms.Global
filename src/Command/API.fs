@@ -12,9 +12,10 @@ open HolidayTracker.Shared.Command.Subscription
 open HolidayTracker.Shared.Command.Authentication
 open HolidayTracker.Shared.Model
 open HolidayTracker.Command.Domain.API
+open HolidayTracker.ServerInterfaces.Command
 
-let createCommandSubscription (domainApi: IDomain) factory (id: string) command filter =
-    let corID = id |> Uri.EscapeDataString |> SagaStarter.toNewCid
+let createCommandSubscription (domainApi: IDomain) factory (cid: CID) (id: string) command filter =
+    let corID = id |> Uri.EscapeDataString |> SagaStarter.toNewCid (cid.Value)
     let actor = factory id
 
     let commonCommand: Command<_> =
@@ -96,28 +97,32 @@ module UserIdentity =
                 | { EventDetails = Domain.UserIdentity.IdentificationSucceded _
                     Version = v }
                 | { EventDetails = Domain.UserIdentity.AlreadyIdentified _
-                    Version = v } -> return Ok(Version v)
+                    Version = v } -> return Ok((Version v))
             }
 
 [<Interface>]
 type IAPI =
     abstract ActorApi: IActor
-    abstract Subscribe: Subscribe
-    abstract Unsubscribe: Unsubscribe
-    abstract IdentifyUser: IdentifyUser
+    abstract Subscribe: CID -> Subscribe
+    abstract Unsubscribe: CID -> Unsubscribe
+    abstract IdentifyUser: CID -> IdentifyUser
 
 let api (env: _) (clock: IClock) =
     let config = env :> IConfiguration
     let actorApi = Actor.api config
     let domainApi = Domain.API.api env clock actorApi
 
-    let userIdentitySubs =
-        createCommandSubscription domainApi domainApi.UserIdentityFactory
+    let userIdentitySubs cid =
+        createCommandSubscription domainApi domainApi.UserIdentityFactory cid
 
-    let userSubs = createCommandSubscription domainApi domainApi.UserFactory
+    let userSubs cid =
+        createCommandSubscription domainApi domainApi.UserFactory cid
 
     { new IAPI with
-        member this.Subscribe: Subscribe = User.subscribe userSubs
-        member this.Unsubscribe: Unsubscribe = User.unsubscribe userSubs
-        member this.IdentifyUser: IdentifyUser = UserIdentity.identifyUser userIdentitySubs
+        member this.Subscribe cid : Subscribe = User.subscribe (userSubs cid)
+        member this.Unsubscribe cid : Unsubscribe = User.unsubscribe (userSubs cid)
+
+        member this.IdentifyUser(cid: CID) : IdentifyUser =
+            UserIdentity.identifyUser (userIdentitySubs (cid))
+
         member _.ActorApi = actorApi }

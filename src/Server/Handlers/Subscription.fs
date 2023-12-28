@@ -16,6 +16,8 @@ let subscriptionAPI (ctx: HttpContext) (env: _) : API.Subscription = {
     Subscribe =
         fun _ region ->
             async {
+                let cid = CID.CreateNew()
+                let query = env :> IQuery
                 Log.Information("{@User} has subscribed to {@Region}", ctx.User.Identity.Name, region)
                 let subs = env :> ISubscription
 
@@ -23,11 +25,16 @@ let subscriptionAPI (ctx: HttpContext) (env: _) : API.Subscription = {
                     ctx.User.FindFirst(fun x -> x.Type = Constants.UserIdentity).Value
                     |> UserIdentity.Create
 
-                return! subs.Subscribe (Some identity) region
+                let _, w = query.Subscribe((fun e -> e.CID = cid), 1, ignore)
+                let! res = subs.Subscribe cid (Some identity) region
+                do! w
+                return res
             }
     Unsubscribe =
         fun _ region ->
             async {
+                let cid = CID.CreateNew()
+                let query = env :> IQuery
                 Log.Information("{@User} has unsubscribed to {@Region}", ctx.User.Identity.Name, region)
                 let subs = env :> ISubscription
 
@@ -35,7 +42,10 @@ let subscriptionAPI (ctx: HttpContext) (env: _) : API.Subscription = {
                     ctx.User.FindFirst(fun x -> x.Type = Constants.UserIdentity).Value
                     |> UserIdentity.Create
 
-                return! subs.Unsubscribe (Some identity) region
+                let _, w = query.Subscribe((fun e -> e.CID = cid), 1, ignore)
+                let! res = subs.Unsubscribe cid (Some identity) region
+                do! w
+                return res
             }
 }
 

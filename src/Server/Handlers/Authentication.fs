@@ -75,13 +75,13 @@ let getUserIdentity (env: _) (userId: UserClientId) =
     async {
         let query = env :> IQuery
 
-        let getUser () = async{
-            let! user = 
-                query.Query<User>(filter = Predicate.Equal("ClientId", userId.Value), take = 1)
-            return user |> Seq.tryHead
-        }
+        let getUser () =
+            async {
+                let! user = query.Query<User>(filter = Predicate.Equal("ClientId", userId.Value), take = 1)
+                return user |> Seq.tryHead
+            }
 
-        let! user = getUser()
+        let! user = getUser ()
 
         let! userIdentity =
             match user with
@@ -89,10 +89,18 @@ let getUserIdentity (env: _) (userId: UserClientId) =
                 let auth = env :> IAuthentication
 
                 async {
-                    let! res = auth.IdentifyUser userId
+                    let cid = CID.CreateNew()
+                    let _, w = query.Subscribe((fun e -> e.CID = cid), 1, ignore)
+
+                    let! res = auth.IdentifyUser cid userId
+
                     Log.Debug("Identification {@res}", res)
-                    let! user = retry getUser
-                    if user.IsNone then return failwith "User can't be polled in DB"
+                    do! w
+                    let! user = getUser ()
+
+                    if user.IsNone then
+                        return failwith "User can't be polled in DB"
+
                     return user.Value
                 }
             | Some user -> async { return user }
@@ -141,7 +149,10 @@ let testSignIn (env: #_) : HttpHandler =
             let email = testUser
             let userId = email |> UserClientId.TryCreate |> forceValidate
             let! userIdentity = getUserIdentity env userId
-            let p = prepareClaimsPrincipal (userId.Value, userIdentity.Identity.Value.Value) config
+
+            let p =
+                prepareClaimsPrincipal (userId.Value, userIdentity.Identity.Value.Value) config
+
             let authProps = AuthenticationProperties()
             authProps.IsPersistent <- true
             do! ctx.SignInAsync(p, authProps) |> Async.AwaitTask

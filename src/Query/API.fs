@@ -24,6 +24,7 @@ type IAPI =
             list<'t> Async
 
     abstract Subscribe: (DataEvent -> unit) -> IKillSwitch
+    abstract Subscribe: (DataEvent -> bool) * int * (DataEvent -> unit) -> IKillSwitch * Async<unit>
 
 let subscribeToStream source mat (sink: Sink<DataEvent, _>) =
     source
@@ -56,8 +57,24 @@ let api (config: IConfiguration) actorApi =
             let ks, _ = subscribeToStream source actorApi.Materializer sink
             ks :> IKillSwitch)
 
+    let subscribeCmdWithFilter =
+        (fun filter take (cb: DataEvent -> unit) ->
+            let subscribeToStream source filter take mat (sink: Sink<DataEvent, _>) =
+                source
+                |> Source.viaMat KillSwitch.single Keep.right
+                |> Source.filter filter
+                |> Source.take take
+                |> Source.toMat (sink) Keep.both
+                |> Graph.run mat
+
+            let sink = Sink.forEach (fun event -> cb (event))
+            let ks, d = subscribeToStream source filter take actorApi.Materializer sink
+            let d = d |> Async.Ignore
+            ks :> IKillSwitch, d)
+
     { new IAPI with
         override this.Subscribe(cb) = subscribeCmd (cb)
+        override this.Subscribe(filter, take, cb) = subscribeCmdWithFilter filter take cb
 
         override this.Query(?filter, ?orderby, ?orderbydesc, ?thenby, ?thenbydesc, ?take, ?skip) : Async<'t list> =
             let ctx = Sql.GetDataContext(connString)

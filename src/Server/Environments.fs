@@ -24,12 +24,12 @@ type AppEnv(config: IConfiguration) as self =
         member _.GetSection key = config.GetSection(key)
 
     interface IAuthentication with
-        member _.IdentifyUser = commandApi.IdentifyUser
+        member _.IdentifyUser cid = commandApi.IdentifyUser cid
 
     interface ISubscription with
-        member _.Subscribe = commandApi.Subscribe
+        member _.Subscribe cid = commandApi.Subscribe cid
 
-        member _.Unsubscribe = commandApi.Unsubscribe
+        member _.Unsubscribe cid = commandApi.Unsubscribe cid
 
     interface IQuery with
         member _.Query(?filter, ?orderby, ?orderbydesc, ?thenby, ?thenbydesc, ?take, ?skip) =
@@ -44,6 +44,7 @@ type AppEnv(config: IConfiguration) as self =
             )
 
         member _.Subscribe(cb) = queryApi.Subscribe(cb)
+        member _.Subscribe(filter, take, cb) = queryApi.Subscribe(filter, take, cb)
 
     member this.Reset() =
         DB.reset config

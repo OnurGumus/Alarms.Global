@@ -54,6 +54,7 @@ open FSharp.Data.Sql.Common
 open Akka.Streams
 open Akkling.Streams
 open System.Threading
+open HolidayTracker.ServerInterfaces.Command
 
 let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISourceQueue<_>) (envelop: EventEnvelope) =
     try
@@ -64,6 +65,7 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
             match envelop.Event with
 
             | :? Command.Common.Event<Command.Domain.UserIdentity.Event> as { EventDetails = eventDetails
+                                                                              CorrelationId = cid
                                                                               Version = v } ->
                 match eventDetails with
                 | Command.Domain.UserIdentity.AlreadyIdentified _ -> None
@@ -72,21 +74,35 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
                         ctx.Main.UserIdentities.``Create(ClientId, Version)`` (user.ClientId.Value, user.Version.Value)
 
                     row.Identity <- user.Identity.Value.Value
-                    Some(IdentificationEvent(IdentificationSucceded user))
+
+                    Some(
+                        { Type = IdentificationEvent(IdentificationSucceded user)
+                          CID = cid |> CID.Create }
+                    )
             | :? Command.Common.Event<Command.Domain.User.Event> as { EventDetails = eventDetails
+                                                                      CorrelationId = cid
                                                                       Version = v } ->
+                let cid = cid |> CID.Create
+
                 match eventDetails with
                 | Command.Domain.User.RemindBeforeDaysSet(identity, days) ->
                     let row = ctx.Main.UserSettings.``Create(ReminderDays, Version)`` (days, v)
                     row.Identity <- identity.Value.Value
-                    Some(UserSettingEvent(RemindBeforeDaysSet(identity, days)))
+
+                    Some(
+                        { Type = UserSettingEvent(RemindBeforeDaysSet(identity, days))
+                          CID = cid }
+                    )
 
                 | Command.Domain.User.AlreadySubscribed _ -> None
                 | Command.Domain.User.Subscribed subs ->
                     let row = ctx.Main.Subscriptions.Create()
                     row.Identity <- subs.Identity.Value.Value
                     row.RegionId <- subs.RegionId.Value.Value
-                    Some(SubscriptionEvent(Subscribed subs))
+
+                    Some
+                        { Type = SubscriptionEvent(Subscribed subs)
+                          CID = cid }
 
                 | Command.Domain.User.AlreadyUnsubscribed _ -> None
                 | Command.Domain.User.Unsubscribed subs ->
@@ -100,7 +116,10 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
                         |> Seq.head
 
                     row.Delete()
-                    Some(SubscriptionEvent(Unsubscribed subs))
+
+                    Some
+                        { Type = SubscriptionEvent(Unsubscribed subs)
+                          CID = cid }
 
             | _ -> None
 
@@ -109,7 +128,7 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
 
         ctx.SubmitUpdates()
 
-        match dataEvent with
+        match (dataEvent: DataEvent option) with
         | Some dataEvent -> subQueue.OfferAsync(dataEvent).Wait()
         | _ -> ()
     with ex ->
