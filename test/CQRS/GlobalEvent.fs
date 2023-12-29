@@ -30,7 +30,6 @@ let ``setup`` () =
 [<Given>]
 let ``today is (.*)`` (date: string) = printfn "today is %s" date
 
-
 [<Given>]
 let ``we have the following subscribers`` (table: Table, env: AppEnv) =
     let auth = env :> IAuthentication
@@ -51,13 +50,9 @@ let ``we have the following subscribers`` (table: Table, env: AppEnv) =
             async {
                 let cid = CID.CreateNew()
                 let _, w = query.Subscribe((fun e -> e.CID = cid), 1, ignore)
-
                 let! _ = auth.IdentifyUser cid email
-
                 do! w
-
                 let! user = getUser (email)
-
                 return user.Value
             }
             |> Async.RunSynchronously
@@ -70,8 +65,6 @@ let ``we have the following subscribers`` (table: Table, env: AppEnv) =
             |> Array.map (fun s -> allRegions |> List.find (fun r -> r.Name.Value = s))
 
         printfn "regions %A" regions
-
-
 
 [<When>]
 let ``I publish an event for (.*) (.*)`` (region: string) (date: string) = printfn "publish for %s %s" region date
