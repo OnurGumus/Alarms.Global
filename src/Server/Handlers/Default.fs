@@ -33,6 +33,7 @@ let webApp (env: _) (layout: HttpContext -> (int -> Task<string>) -> string Task
         routex @".*(?:Subscribe|Unsubscribe).*"
         >=> auth
         >=> (Subscription.subscriptionHandler env)
+        Admin.handler env layout
     ]
 
 let webAppWrapper (env: _) (layout: HttpContext -> (int -> Task<string>) -> string Task) =

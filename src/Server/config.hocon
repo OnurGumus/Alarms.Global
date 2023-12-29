@@ -1,6 +1,7 @@
 config {
      connection-string = "Data Source=Database/HolidayTracker.db;"
      default-reminder-days = 7
+       admins = ["emperon@gmail.com"]
      akka {
      persistence {
           journal {
