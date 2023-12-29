@@ -4,4 +4,4 @@ open Expecto
 open ExpectoTickSpecHelper
 
 [<Tests>]
-let show_tasks = featureTest "GlobalEvent.feature"
+let global_event = featureTest "GlobalEvent.feature"
