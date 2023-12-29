@@ -34,7 +34,7 @@ let ``today is (.*)`` (date: string) = printfn "today is %s" date
 let ``we have the following subscribers`` (table: Table, env: AppEnv) =
     let auth = env :> IAuthentication
     let query = env :> IQuery
-
+    let subs = env :> ISubscription
     let allRegions = query.Query<Region>() |> Async.RunSynchronously
 
     let getUser (email: Email) =
@@ -65,9 +65,22 @@ let ``we have the following subscribers`` (table: Table, env: AppEnv) =
             |> Array.map (fun s -> allRegions |> List.find (fun r -> r.Name.Value = s))
 
         printfn "regions %A" regions
-
+        for region in regions do 
+            async{ 
+                let cid = CID.CreateNew()
+                let _, w = query.Subscribe((fun e -> e.CID = cid), 1, ignore)
+                let! _ = (subs.Subscribe cid (Some user.Identity) region.RegionId) 
+                do! w
+                return ()
+            } |> Async.RunSynchronously
 [<When>]
-let ``I publish an event for (.*) (.*)`` (region: string) (date: string) = printfn "publish for %s %s" region date
+let ``I publish an event for (.*) (.*)`` (region: string) (date: string) (env:AppEnv) = 
+    (task{
+        let query = env :> IQuery
+        let allRegions = query.Query<Region>() |> Async.RunSynchronously
+        let targetRegion = allRegions |> List.find (fun r -> r.Name.Value = region)
+        return ()
+    }).Wait()
 
 [<Then>]
 let ``nothing should happen`` () = printfn "nothing should happen"
