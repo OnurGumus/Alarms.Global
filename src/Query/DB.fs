@@ -36,8 +36,8 @@ type One() =
 
     override this.Down() =
         try
-           if this.Schema.Table("snapshot").Exists() then
-            // clean up akka stuff
+            if this.Schema.Table("snapshot").Exists() then
+                // clean up akka stuff
                 this.Execute.Sql("DELETE FROM snapshot")
                 this.Execute.Sql("DELETE FROM JOURNAL")
                 this.Execute.Sql("DELETE FROM SQLITE_SEQUENCE")
@@ -47,12 +47,11 @@ type One() =
 
 let regions =
     [ "Argentina"; "Brazil"; "Canada"; "Denmark"; "France" ]
-    |> List.map (fun name -> {
-        RegionId = RegionId.CreateNew()
-        AlrernateNames = []
-        RegionType = Country
-        Name = name |> ShortString.TryCreate |> forceValidate
-    })
+    |> List.map (fun name ->
+        { RegionId = RegionId.CreateNew()
+          AlrernateNames = []
+          RegionType = Country
+          Name = name |> ShortString.TryCreate |> forceValidate })
     |> List.ofSeq
 
 [<MigrationAttribute(2023_12_11_1340L)>]
@@ -76,12 +75,11 @@ type AddRegions() =
 
         for region in regions do
             let row: IDictionary<string, obj> =
-                let l = [
-                    ("RegionId", region.RegionId.Value.Value :> obj)
-                    "Name", region.Name.Value
-                    "Type", region.RegionType.ToString()
-                    "AlternateNames", (region.AlrernateNames |> encode) :> obj
-                ]
+                let l =
+                    [ ("RegionId", region.RegionId.Value.Value :> obj)
+                      "Name", region.Name.Value
+                      "Type", region.RegionType.ToString()
+                      "AlternateNames", (region.AlrernateNames |> encode) :> obj ]
 
                 Map.ofSeq l
 
@@ -172,6 +170,32 @@ type AddUserSettingsTable() =
 
     override this.Down() =
         this.Delete.Table("UserSettings") |> ignore
+
+
+[<MigrationAttribute(2023_12_29_2033L)>]
+type AddUserGlobalEventsTable() =
+    inherit Migration()
+
+    override this.Up() =
+        this.Create
+            .Table("GlobalEvents")
+            .WithColumn("Id")
+            .AsString()
+            .PrimaryKey()
+            .WithColumn("Title")
+            .AsString()
+            .WithColumn("Body")
+            .AsString()
+            .WithColumn("RegionIds")
+            .AsString()
+            .WithColumn("TargetDate")
+            .AsDateTime()
+            .Nullable()
+        |> ignore
+
+    override this.Down() =
+        this.Delete.Table("GlobalEvents") |> ignore
+
 let updateDatabase (serviceProvider: IServiceProvider) =
     let runner = serviceProvider.GetRequiredService<IMigrationRunner>()
     runner.MigrateUp()

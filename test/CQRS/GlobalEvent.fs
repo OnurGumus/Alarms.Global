@@ -93,11 +93,11 @@ let ``I publish an event for (.*) (.*)`` (region: string) (date: string) (env: A
               Title = "My event" |> ShortString.TryCreate |> forceValidate
               Body = "My Body" |> LongString.TryCreate |> forceValidate
               EventDateInUTC = Some date
-              TargetRegion = [ targetRegion.RegionId ]
-            }
+              TargetRegion = [ targetRegion.RegionId ] }
 
-        let! res = subs.PublishEvent (cid) globalEvent
-        printfn "%A" res
+        let _, w = query.Subscribe((fun e -> e.CID = cid), 1, ignore)
+        let! _ = subs.PublishEvent (cid) globalEvent
+        do! w
         return ()
     })
         .Wait()

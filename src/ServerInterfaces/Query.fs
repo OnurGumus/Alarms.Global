@@ -14,10 +14,13 @@ type IdentificationEvent = IdentificationSucceded of User
 
 type UserSettingEvent = RemindBeforeDaysSet of UserIdentity * int
 
+type GlobalEventEvent = Published of GlobalEvent
+
 type DataEventType =
     | SubscriptionEvent of SubscriptionEvent
     | IdentificationEvent of IdentificationEvent
     | UserSettingEvent of UserSettingEvent
+    | GlobalEventEvent of GlobalEventEvent
 
 type DataEvent = { Type: DataEventType; CID: CID }
 

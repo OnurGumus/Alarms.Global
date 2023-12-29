@@ -63,7 +63,37 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
 
         let dataEvent =
             match envelop.Event with
+            | :? Command.Common.Event<Command.Domain.GlobalEvent.Event> as { EventDetails = eventDetails
+                                                                             CorrelationId = cid
+                                                                             Version = v } ->
+                match eventDetails with
+                | Command.Domain.GlobalEvent.Published globalEvent ->
+                    let cid = cid |> CID.Create
 
+                    let regions =
+                        globalEvent.TargetRegion
+                        |> List.map (fun s -> s.Value.Value)
+                        |> String.concat ","
+
+                    let row =
+                        ctx.Main.GlobalEvents.``Create(Body, RegionIds, Title)`` (
+                            globalEvent.Body.Value,
+                            regions,
+                            globalEvent.Title.Value
+                        )
+
+                    row.Id <- globalEvent.GlobalEventId.Value.Value
+
+                    row.TargetDate <-
+                        globalEvent.EventDateInUTC
+                        |> function
+                            | Some d -> d.ToString()
+                            | _ -> null
+
+                    Some(
+                        { Type = GlobalEventEvent(Published(globalEvent))
+                          CID = cid }
+                    )
             | :? Command.Common.Event<Command.Domain.UserIdentity.Event> as { EventDetails = eventDetails
                                                                               CorrelationId = cid
                                                                               Version = v } ->
@@ -79,6 +109,7 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
                         { Type = IdentificationEvent(IdentificationSucceded user)
                           CID = cid |> CID.Create }
                     )
+
             | :? Command.Common.Event<Command.Domain.User.Event> as { EventDetails = eventDetails
                                                                       CorrelationId = cid
                                                                       Version = v } ->
