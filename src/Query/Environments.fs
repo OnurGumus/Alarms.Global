@@ -30,6 +30,8 @@ type AppEnv(config: IConfiguration) as self =
         member _.Subscribe cid = commandApi.Subscribe cid
 
         member _.Unsubscribe cid = commandApi.Unsubscribe cid
+            
+        member _.PublishEvent cid = commandApi.PublishEvent cid
 
     interface IQuery with
         member _.Query(?filter, ?orderby, ?orderbydesc, ?thenby, ?thenbydesc, ?take, ?skip) =

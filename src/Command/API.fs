@@ -31,6 +31,24 @@ let createCommandSubscription (domainApi: IDomain) factory (cid: CID) (id: strin
     let ex = Execute e
     ex |> domainApi.ActorApi.SubscribeForCommand
 
+module GlobalEvent =
+    let publishEvent (createSubs) : PublishEvent =
+        fun (globalEvent) ->
+            async {
+                Log.Debug("Inside publishEvent {@globalEvent}", globalEvent)
+
+                let! subscribe =
+                    createSubs
+                        (globalEvent.GlobalEventId.Value.Value)
+                        (Domain.GlobalEvent.Command.Publish globalEvent)
+                        (function
+                         | Domain.GlobalEvent.Published _ -> true)
+
+                match subscribe with
+                | { EventDetails = Domain.GlobalEvent.Published _
+                    Version = v } -> return Ok(Version v)
+            }
+
 module User =
     open HolidayTracker.Shared.Model.Subscription
 
@@ -106,6 +124,7 @@ type IAPI =
     abstract Subscribe: CID -> Subscribe
     abstract Unsubscribe: CID -> Unsubscribe
     abstract IdentifyUser: CID -> IdentifyUser
+    abstract PublishEvent: CID -> PublishEvent
 
 let api (env: _) (clock: IClock) =
     let config = env :> IConfiguration
@@ -118,9 +137,15 @@ let api (env: _) (clock: IClock) =
     let userSubs cid =
         createCommandSubscription domainApi domainApi.UserFactory cid
 
+    let globalEventSubs cid =
+        createCommandSubscription domainApi domainApi.GlobalEventFactory cid
+
     { new IAPI with
         member this.Subscribe cid : Subscribe = User.subscribe (userSubs cid)
         member this.Unsubscribe cid : Unsubscribe = User.unsubscribe (userSubs cid)
+
+        member this.PublishEvent cid : PublishEvent =
+            GlobalEvent.publishEvent (globalEventSubs cid)
 
         member this.IdentifyUser(cid: CID) : IdentifyUser =
             UserIdentity.identifyUser (userIdentitySubs (cid))

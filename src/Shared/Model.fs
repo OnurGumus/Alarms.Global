@@ -199,8 +199,26 @@ module Subscription =
         { Identity: Authentication.UserIdentity
           BeforeDays: int }
 
+    type GlobalEventId =
+        | GlobalEventId of ShortString
+
+        member this.Value = let (GlobalEventId rid) = this in rid
+
+        static member CreateNew() =
+            "GlobalEvent_" + Guid.NewGuid().ToString()
+            |> ShortString.TryCreate
+            |> forceValidate
+            |> GlobalEventId
+
+        static member Create(s: string) =
+            s |> ShortString.TryCreate |> forceValidate |> GlobalEventId
+
+        static member Validate(s: LongString) =
+            s.Value |> ShortString.TryCreate |> forceValidate
+
     type GlobalEvent =
-        { Title: ShortString
+        { GlobalEventId: GlobalEventId
+          Title: ShortString
           Body: LongString
-          EvetDateInUTC: DateTime option
+          EventDateInUTC: DateTime option
           TargetRegion: RegionId list }

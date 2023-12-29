@@ -16,6 +16,8 @@ open HolidayTracker.ServerInterfaces.Command
 open HolidayTracker.Shared.Model.Authentication
 open HolidayTracker.ServerInterfaces.Query
 open HolidayTracker.Shared.Model.Subscription
+open System
+
 
 let configBuilder = ConfigurationBuilder()
 let config = configBuilder.AddHoconFile("test-config.hocon").Build()
@@ -65,22 +67,40 @@ let ``we have the following subscribers`` (table: Table, env: AppEnv) =
             |> Array.map (fun s -> allRegions |> List.find (fun r -> r.Name.Value = s))
 
         printfn "regions %A" regions
-        for region in regions do 
-            async{ 
+
+        for region in regions do
+            async {
                 let cid = CID.CreateNew()
                 let _, w = query.Subscribe((fun e -> e.CID = cid), 1, ignore)
-                let! _ = (subs.Subscribe cid (Some user.Identity) region.RegionId) 
+                let! _ = (subs.Subscribe cid (Some user.Identity) region.RegionId)
                 do! w
                 return ()
-            } |> Async.RunSynchronously
+            }
+            |> Async.RunSynchronously
+
 [<When>]
-let ``I publish an event for (.*) (.*)`` (region: string) (date: string) (env:AppEnv) = 
-    (task{
+let ``I publish an event for (.*) (.*)`` (region: string) (date: string) (env: AppEnv) =
+    (task {
         let query = env :> IQuery
+        let subs = env :> ISubscription
         let allRegions = query.Query<Region>() |> Async.RunSynchronously
+        let date = DateTime.SpecifyKind(DateTime.Parse(date), DateTimeKind.Utc)
         let targetRegion = allRegions |> List.find (fun r -> r.Name.Value = region)
+        let cid = CID.CreateNew()
+
+        let globalEvent =
+            { GlobalEventId = GlobalEventId.CreateNew()
+              Title = "My event" |> ShortString.TryCreate |> forceValidate
+              Body = "My Body" |> LongString.TryCreate |> forceValidate
+              EventDateInUTC = Some date
+              TargetRegion = [ targetRegion.RegionId ]
+            }
+
+        let! res = subs.PublishEvent (cid) globalEvent
+        printfn "%A" res
         return ()
-    }).Wait()
+    })
+        .Wait()
 
 [<Then>]
 let ``nothing should happen`` () = printfn "nothing should happen"
