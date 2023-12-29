@@ -13,11 +13,20 @@
             "problemMatcher": [ "$msCompile" ]
         },
         {
-            "label": "Build Test",
+            "label": "Build Automation",
             "command": "dotnet",
             "args": [ "build" ],
             "type": "shell",
             "options": { "cwd": "${workspaceFolder}/test/Automation" },
+            "group": "build",
+            "problemMatcher": [ "$msCompile" ]
+        },
+        {
+            "label": "Build CQRSTest",
+            "command": "dotnet",
+            "args": [ "build" ],
+            "type": "shell",
+            "options": { "cwd": "${workspaceFolder}/test/CQRS" },
             "group": "build",
             "problemMatcher": [ "$msCompile" ]
         },

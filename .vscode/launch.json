@@ -32,11 +32,25 @@
             // }
         },
         {
-            "name": "Debug Test",
+            "name": "Debug Automation",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "Build Test",
+            "preLaunchTask": "Build Automation",
             "program": "${workspaceFolder}/test/Automation/bin/Debug/net8.0/Automation.dll",
+            "args": [],
+            "justMyCode" : true,
+            "logging": {
+                "moduleLoad": false
+            },
+            "stopAtEntry": false,
+            "console": "internalConsole",
+        },
+        {
+            "name": "Debug CQRS Test",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build CQRSTest",
+            "program": "${workspaceFolder}/test/CQRS/bin/Debug/net8.0/CQRS.dll",
             "args": [],
             "justMyCode" : true,
             "logging": {
