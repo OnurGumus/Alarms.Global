@@ -36,11 +36,12 @@ type One() =
 
     override this.Down() =
         try
+           if this.Schema.Table("snapshot").Exists() then
             // clean up akka stuff
-            this.Execute.Sql("DELETE FROM SNAPSHOT") |> ignore
-            this.Execute.Sql("DELETE FROM JOURNAL") |> ignore
-            this.Execute.Sql("DELETE FROM SQLITE_SEQUENCE") |> ignore
-            this.Execute.Sql("DELETE FROM TAGS") |> ignore
+                this.Execute.Sql("DELETE FROM snapshot")
+                this.Execute.Sql("DELETE FROM JOURNAL")
+                this.Execute.Sql("DELETE FROM SQLITE_SEQUENCE")
+                this.Execute.Sql("DELETE FROM TAGS")
         with _ ->
             ()
 
