@@ -3,7 +3,7 @@
 open Expecto.Tests
 open Serilog
 open Serilog.Formatting.Compact
-
+open Serilog.Sinks.SystemConsole.Themes
 
 [<EntryPoint>]
 let main args =
@@ -11,10 +11,8 @@ let main args =
         LoggerConfiguration()
             .MinimumLevel.Debug()
             .Destructure.FSharpTypes()
-            .WriteTo.Console(RenderedCompactJsonFormatter())
+            .WriteTo.Console(theme = AnsiConsoleTheme.Literate, applyThemeToRedirectedOutput = true)
             .Enrich.FromLogContext()
             .CreateLogger()
 
-    runTestsInAssemblyWithCLIArgs [] [|
-        "--sequenced"
-    |]
+    runTestsInAssemblyWithCLIArgs [] [| "--sequenced" |]
