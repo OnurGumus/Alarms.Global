@@ -163,7 +163,7 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
         | Some dataEvent -> subQueue.OfferAsync(dataEvent).Wait()
         | _ -> ()
     with ex ->
-        Log.Error(ex, "Error during event handling")
+        Log.Fatal(ex, "Error during event handling")
         actorApi.System.Terminate().Wait()
         Log.CloseAndFlush()
         System.Environment.Exit(-1)
