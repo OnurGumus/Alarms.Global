@@ -67,6 +67,7 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
                                                                              CorrelationId = cid
                                                                              Version = v } ->
                 match eventDetails with
+                | Command.Domain.GlobalEvent.EventAlreadyPublished _ -> None
                 | Command.Domain.GlobalEvent.Published globalEvent ->
                     let cid = cid |> CID.Create
 

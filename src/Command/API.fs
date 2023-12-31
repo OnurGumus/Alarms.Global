@@ -42,11 +42,14 @@ module GlobalEvent =
                         (globalEvent.GlobalEventId.Value.Value)
                         (Domain.GlobalEvent.Command.Publish globalEvent)
                         (function
+                         | Domain.GlobalEvent.EventAlreadyPublished _
                          | Domain.GlobalEvent.Published _ -> true)
 
                 match subscribe with
                 | { EventDetails = Domain.GlobalEvent.Published _
                     Version = v } -> return Ok(Version v)
+                | { EventDetails = Domain.GlobalEvent.EventAlreadyPublished _ } ->
+                    return Error["This event is already published"]
             }
 
 module User =

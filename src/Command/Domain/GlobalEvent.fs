@@ -21,10 +21,13 @@ open HolidayTracker.Shared
 
 type Command = Publish of GlobalEvent
 
-type Event = Published of GlobalEvent
+type Event =
+    | Published of GlobalEvent
+    | EventAlreadyPublished of GlobalEvent
 
 type State =
-    { Version: int64 }
+    { GlobalEvent: GlobalEvent option
+      Version: int64 }
 
     interface IDefaultTag
 
@@ -40,6 +43,9 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
             log.Debug("Apply Message {@Event}, State: @{State}", event, state)
 
             match event with
+            | Published globalEvent ->
+                { state with
+                    GlobalEvent = Some globalEvent }
             | _ -> state
 
         actor {
@@ -84,18 +90,19 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
 
                     match commandDetails with
                     | Publish globalEvent ->
+                        let e, v =
+                            if state.GlobalEvent.IsNone then
+                                Published globalEvent, (v + 1L)
+                            else
+                                EventAlreadyPublished globalEvent, v
 
-                        let e = Published globalEvent
-
-                        let outcome = toEvent ci (v + 1L) e |> sendToSagaStarter ci |> box |> Persist
-                        return! outcome
-
+                        return! toEvent ci (v) e |> sendToSagaStarter ci |> box |> Persist
                 | _ ->
                     log.Debug("Unhandled Message {@MSG}", box msg)
                     return Unhandled
         }
 
-    set { Version = 0L }
+    set { Version = 0L; GlobalEvent = None }
 
 let init (env: _) toEvent (actorApi: IActor) =
     AkklingHelpers.entityFactoryFor actorApi.System shardResolver "GlobalEvent"
