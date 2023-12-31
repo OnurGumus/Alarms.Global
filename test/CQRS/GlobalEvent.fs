@@ -98,6 +98,8 @@ let ``I publish an event for (.*) (.*)`` (region: string) (date: string) (env: A
         let _, w = query.Subscribe((fun e -> e.CID = cid), 1, ignore)
         let! _ = subs.PublishEvent (cid) globalEvent
         do! w
+        let! event = query.Query<GlobalEvent>(filter = Equal("Id", globalEvent.GlobalEventId.Value.Value), take = 1)
+        printfn "%A" event.Head
         return ()
     })
         .Wait()

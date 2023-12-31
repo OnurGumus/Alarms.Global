@@ -240,6 +240,24 @@ let api (config: IConfiguration) actorApi =
                         : UserSetting)
                     |> List.ofSeq
                     |> box
+
+                elif typeof<'t> = typeof<GlobalEvent> then
+                    let q =
+                        query {
+                            for c in ctx.Main.GlobalEvents do
+                                select c
+                        }
+
+                    augment <@ q @>
+                    |> Seq.map (fun x ->
+                        { GlobalEventId = x.Id |> GlobalEventId.Create
+                          Title = x.Title |> ShortString.TryCreate |> forceValidate
+                          Body = x.Body |> LongString.TryCreate |> forceValidate
+                          TargetRegion = x.RegionIds |> decode |> forceValidateWithString
+                          EventDateInUTC = x.TargetDate |> System.DateTime.Parse |> Some }
+                        : GlobalEvent)
+                    |> List.ofSeq
+                    |> box
                 else
                     failwith "not implemented"
 
