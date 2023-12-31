@@ -70,10 +70,7 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
                 | Command.Domain.GlobalEvent.Published globalEvent ->
                     let cid = cid |> CID.Create
 
-                    let regions =
-                        globalEvent.TargetRegion
-                        |> List.map (fun s -> s.Value.Value)
-                        |> String.concat ","
+                    let regions = globalEvent.TargetRegion |> encode
 
                     let row =
                         ctx.Main.GlobalEvents.``Create(Body, RegionIds, Title)`` (
