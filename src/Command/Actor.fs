@@ -11,10 +11,46 @@ open Akkling
 open Microsoft.Extensions.Configuration
 open Common.DynamicConfig
 open System.Dynamic
-open FSharp.Interop.Dynamic
-open System.Runtime.CompilerServices
-open Microsoft.Extensions.Configuration
-open System
+open Command
+open Akkling.Persistence
+open Akka
+open Common
+open Akka.Logger.Serilog
+open Akka.Event
+
+let common<'TEvent, 'TState>
+    (mailbox: Eventsourced<obj>)
+    (publishEvent: Event<'TEvent> -> unit)
+    (set: 'TState -> _)
+    (state: 'TState)
+    (applyNewState: Event<'TEvent> -> 'TState -> 'TState)
+    body
+    (msg: obj)
+    =
+    actor {
+        let log = mailbox.UntypedContext.GetLogger()
+        log.Debug("Message {MSG}, State: {@State}", box msg, state)
+
+        match msg with
+        | PersistentLifecycleEvent _
+        | :? Persistence.SaveSnapshotSuccess
+        | LifecycleEvent _ -> return! state |> set
+
+        | SnapshotOffer(snapState: obj) -> return! snapState |> unbox<_> |> set
+
+        // actor level events will come here
+        | Persisted mailbox (:? Common.Event<'TEvent> as event) ->
+            let version = event.Version
+            publishEvent event
+
+            let state = applyNewState event state
+
+            if (version >= 30L && version % 30L = 0L) then
+                return! state |> set <@> SaveSnapshot(state)
+            else
+                return! state |> set
+        | _ -> return! (body msg)
+    }
 
 let private defaultTag = ImmutableHashSet.Create("default")
 

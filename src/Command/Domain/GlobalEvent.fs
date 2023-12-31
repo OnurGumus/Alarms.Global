@@ -10,14 +10,9 @@ open Serilog
 open System
 open Akka.Cluster.Tools.PublishSubscribe
 open Actor
-open Microsoft.Extensions.Configuration
-open HolidayTracker.Shared.Model.Authentication
-open HolidayTracker.Shared.Model
 open Akka.Logger.Serilog
 open Akka.Event
-open HolidayTracker.ServerInterfaces.Command
 open HolidayTracker.Shared.Model.Subscription
-open HolidayTracker.Shared
 
 type Command = Publish of GlobalEvent
 
@@ -37,6 +32,9 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
     let mediatorS = retype mediator
     let sendToSagaStarter = SagaStarter.toSendMessage mediatorS mailbox.Self
 
+    let publishEvent event =
+        SagaStarter.publishEvent mailbox mediator event event.CorrelationId
+
     let rec set (state: State) =
 
         let apply (event: Event) (state: State) =
@@ -48,47 +46,20 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
                     GlobalEvent = Some globalEvent }
             | _ -> state
 
-        actor {
-            let! msg = mailbox.Receive()
-            log.Debug("Message {MSG}, State: {@State}", box msg, state)
+        let applyNewState event state =
+            { (apply event.EventDetails state) with
+                Version = event.Version }
 
-            match msg with
-            | PersistentLifecycleEvent _
-            | :? Persistence.SaveSnapshotSuccess
-            | LifecycleEvent _ -> return! state |> set
-
-            | SnapshotOffer(snapState: obj) -> return! snapState |> unbox<_> |> set
-
-            // actor level events will come here
-            | Persisted mailbox (:? Common.Event<Event> as event) ->
-                let version = event.Version
-                SagaStarter.publishEvent mailbox mediator event event.CorrelationId
-
-                let state =
-                    { (apply event.EventDetails state) with
-                        Version = version }
-
-                if (version >= 30L && version % 30L = 0L) then
-                    return! state |> set <@> SaveSnapshot(state)
-                else
-                    return! state |> set
-
-            | Recovering mailbox (:? Common.Event<Event> as event) ->
-                return!
-                    { (apply event.EventDetails state) with
-                        Version = event.Version }
-                    |> set
-
-            | _ ->
+        let body (msg: obj) =
+            actor {
+                let v = state.Version
                 match msg with
                 | :? Persistence.RecoveryCompleted -> return! state |> set
 
                 | :? (Common.Command<Command>) as userMsg ->
                     let ci = userMsg.CorrelationId
-                    let commandDetails = userMsg.CommandDetails
-                    let v = state.Version
 
-                    match commandDetails with
+                    match userMsg.CommandDetails with
                     | Publish globalEvent ->
                         let e, v =
                             if state.GlobalEvent.IsNone then
@@ -96,10 +67,15 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
                             else
                                 EventAlreadyPublished globalEvent, v
 
-                        return! toEvent ci (v) e |> sendToSagaStarter ci |> box |> Persist
+                        return! toEvent ci v e |> sendToSagaStarter ci |> box |> Persist
                 | _ ->
                     log.Debug("Unhandled Message {@MSG}", box msg)
                     return Unhandled
+            }
+
+        actor {
+            let! msg = mailbox.Receive()
+            return! common mailbox publishEvent set state applyNewState body msg
         }
 
     set { Version = 0L; GlobalEvent = None }
