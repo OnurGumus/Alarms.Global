@@ -29,30 +29,23 @@ type State =
 let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsourced<obj>) =
     let log = mailbox.UntypedContext.GetLogger()
 
-    let mediatorS = retype mediator
-    let sendToSagaStarter = SagaStarter.toSendMessage mediatorS mailbox.Self
+    let sendToSagaStarter = SagaStarter.toSendMessage (retype mediator) mailbox.Self
 
-    let publishEvent event =
-        SagaStarter.publishEvent mailbox mediator event event.CorrelationId
+    let apply event state =
+        log.Debug("Apply Message {@Event}, State: @{State}", event, state)
+
+        match event.EventDetails with
+        | Published globalEvent ->
+            { state with
+                GlobalEvent = Some globalEvent }
+        | _ -> state
+        |> fun state -> { state with Version = event.Version }
 
     let rec set (state: State) =
-
-        let apply (event: Event) (state: State) =
-            log.Debug("Apply Message {@Event}, State: @{State}", event, state)
-
-            match event with
-            | Published globalEvent ->
-                { state with
-                    GlobalEvent = Some globalEvent }
-            | _ -> state
-
-        let applyNewState event state =
-            { (apply event.EventDetails state) with
-                Version = event.Version }
-
         let body (msg: obj) =
             actor {
                 let v = state.Version
+
                 match msg with
                 | :? Persistence.RecoveryCompleted -> return! state |> set
 
@@ -73,10 +66,7 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
                     return Unhandled
             }
 
-        actor {
-            let! msg = mailbox.Receive()
-            return! common mailbox publishEvent set state applyNewState body msg
-        }
+        common mailbox mediator set state apply body 
 
     set { Version = 0L; GlobalEvent = None }
 

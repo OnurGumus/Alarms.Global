@@ -20,15 +20,20 @@ open Akka.Event
 
 let common<'TEvent, 'TState>
     (mailbox: Eventsourced<obj>)
-    (publishEvent: Event<'TEvent> -> unit)
+    mediator
     (set: 'TState -> _)
     (state: 'TState)
     (applyNewState: Event<'TEvent> -> 'TState -> 'TState)
     body
-    (msg: obj)
+
     =
+    let publishEvent event =
+        SagaStarter.publishEvent mailbox mediator event event.CorrelationId
+
     actor {
         let log = mailbox.UntypedContext.GetLogger()
+        let! msg = mailbox.Receive()
+
         log.Debug("Message {MSG}, State: {@State}", box msg, state)
 
         match msg with
