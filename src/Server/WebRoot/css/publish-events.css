@@ -1,0 +1,13 @@
+@layer base, layout, text, appearance, other,animation;
+ 
+@import "base.css?v=202312261741" layer(base);
+
+
+@layer layout {
+    form{
+        inline-size:var(--size-fluid-10);
+        display:flex;
+        flex-direction:column;
+        gap:1rem;
+    }
+}

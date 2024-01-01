@@ -81,7 +81,7 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
                         globalEvent.EventDateInUTC
                         |> function
                             | Some d -> d.ToString()
-                            | _ -> null
+                            | _ -> ""
 
                     for region in globalEvent.TargetRegion do
                         let regionId = ctx.Main.EventsRegions.Create()

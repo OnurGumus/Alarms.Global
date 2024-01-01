@@ -10,6 +10,7 @@
     <Compile Include="Views/Index.fs" />
     <Compile Include="Views/Layout.fs" />
     <Compile Include="Views/Privacy.fs" />
+    <Compile Include="Views\Admin\PublishEvent.fs" />
     <Compile Include="Views\Admin\Index.fs" />
     <Compile Include="Handlers\Admin.fs" />
     <Compile Include="Handlers\Authentication.fs" />
