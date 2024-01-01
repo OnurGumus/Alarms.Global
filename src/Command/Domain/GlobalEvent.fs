@@ -3,11 +3,8 @@ module HolidayTracker.Command.Domain.GlobalEvent
 open Command
 open Akkling
 open Akkling.Persistence
-open AkklingHelpers
 open Akka
 open Common
-open Serilog
-open System
 open Akka.Cluster.Tools.PublishSubscribe
 open Actor
 open Akka.Logger.Serilog
