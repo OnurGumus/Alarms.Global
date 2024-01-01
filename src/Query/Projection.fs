@@ -33,7 +33,7 @@ let connectionString = @"Data Source=" + @"Database/HolidayTracker.db;"
 
 
 type Sql =
-    SqlDataProvider<DatabaseProviderTypes.SQLITE, ContextSchemaPath=schemaLocation, SQLiteLibrary=SQLiteLibrary.MicrosoftDataSqlite, ConnectionString=connectionString, ResolutionPath=resolutionPath, CaseSensitivityChange=CaseSensitivityChange.ORIGINAL>
+    SqlDataProvider<DatabaseProviderTypes.SQLITE, SQLiteLibrary=SQLiteLibrary.MicrosoftDataSqlite, ContextSchemaPath=schemaLocation, ConnectionString=connectionString, ResolutionPath=resolutionPath, CaseSensitivityChange=CaseSensitivityChange.ORIGINAL>
 
 QueryEvents.SqlQueryEvent
 |> Event.add (fun query -> Log.Debug("Executing SQL {query}:", query))
@@ -71,22 +71,22 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
                 | Command.Domain.GlobalEvent.Published globalEvent ->
                     let cid = cid |> CID.Create
 
-                    let regions = globalEvent.TargetRegion |> encode
 
-                    let row =
-                        ctx.Main.GlobalEvents.``Create(Body, RegionIds, Title)`` (
-                            globalEvent.Body.Value,
-                            regions,
-                            globalEvent.Title.Value
-                        )
+                    let globalEventRow =
+                        ctx.Main.GlobalEvents.``Create(Body, Title)`` (globalEvent.Body.Value, globalEvent.Title.Value)
 
-                    row.Id <- globalEvent.GlobalEventId.Value.Value
+                    globalEventRow.Id <- globalEvent.GlobalEventId.Value.Value
 
-                    row.TargetDate <-
+                    globalEventRow.TargetDate <-
                         globalEvent.EventDateInUTC
                         |> function
                             | Some d -> d.ToString()
                             | _ -> null
+
+                    for region in globalEvent.TargetRegion do
+                        let regionId = ctx.Main.EventsRegions.Create()
+                        regionId.EventId <- globalEventRow.Id
+                        regionId.RegionId <- region.Value.Value
 
                     Some(
                         { Type = GlobalEventEvent(Published(globalEvent))

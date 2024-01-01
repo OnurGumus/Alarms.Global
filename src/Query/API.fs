@@ -253,7 +253,14 @@ let api (config: IConfiguration) actorApi =
                         { GlobalEventId = x.Id |> GlobalEventId.Create
                           Title = x.Title |> ShortString.TryCreate |> forceValidate
                           Body = x.Body |> LongString.TryCreate |> forceValidate
-                          TargetRegion = x.RegionIds |> decode |> forceValidateWithString
+                          TargetRegion =
+                            query {
+                                for er in ctx.Main.EventsRegions do
+                                    where (er.EventId = x.Id)
+                                    select er.RegionId
+                            }
+                            |> Seq.map (fun r -> RegionId.Create r)
+                            |> List.ofSeq
                           EventDateInUTC = x.TargetDate |> System.DateTime.Parse |> Some }
                         : GlobalEvent)
                     |> List.ofSeq

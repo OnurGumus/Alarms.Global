@@ -192,9 +192,28 @@ type AddUserGlobalEventsTable() =
             .AsDateTime()
             .Nullable()
         |> ignore
-
     override this.Down() =
         this.Delete.Table("GlobalEvents") |> ignore
+
+[<MigrationAttribute(2024_01_01_1429L)>]
+type SeperateEventRegionsTable() =
+    inherit Migration()
+
+    override this.Up() =
+        this.Create
+            .Table("EventsRegions")
+            .WithColumn("EventId")
+            .AsString()
+            .PrimaryKey()
+            .WithColumn("RegionId")
+            .AsString()
+            .PrimaryKey()
+            .Nullable()
+        |> ignore
+        this.Delete.Column("RegionIds").FromTable("GlobalEvents") |> ignore
+
+    override this.Down() =
+        this.Delete.Table("EventsRegions") |> ignore
 
 let updateDatabase (serviceProvider: IServiceProvider) =
     let runner = serviceProvider.GetRequiredService<IMigrationRunner>()
