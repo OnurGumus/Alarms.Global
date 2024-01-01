@@ -25,7 +25,7 @@ type OriginatorName =
 
     member this.Value = let (OriginatorName on) = this in on
 
-type IDefaultTag =
+type ISerializable =
     interface
     end
 
@@ -34,7 +34,7 @@ type Command<'CommandDetails> =
       CreationDate: Instant
       CorrelationId: string }
 
-    interface IDefaultTag
+    interface ISerializable
 
 type Event<'EventDetails> =
     { EventDetails: 'EventDetails
@@ -42,7 +42,7 @@ type Event<'EventDetails> =
       CorrelationId: string
       Version: int64 }
 
-    interface IDefaultTag
+    interface ISerializable
 
 let eventEncoder (detailsEncoder) (event: Event<'EventDetails>) =
     Encode.object

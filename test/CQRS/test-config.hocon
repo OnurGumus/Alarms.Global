@@ -50,7 +50,7 @@ config{
           }
           serialization-bindings {
                "System.Object" = json
-               "Command.Common+IDefaultTag, Command" = thoth
+               "Command.Common+ISerializable, Command" = thoth
           }
      }
      remote {

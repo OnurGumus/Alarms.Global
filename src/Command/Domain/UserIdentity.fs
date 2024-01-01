@@ -23,7 +23,7 @@ type State =
     { User: User option
       Version: int64 }
 
-    interface IDefaultTag
+    interface ISerializable
 let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsourced<obj>) =
     let config = env :> IConfiguration
     let log = mailbox.UntypedContext.GetLogger()

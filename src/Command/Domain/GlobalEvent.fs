@@ -21,7 +21,7 @@ type State =
     { GlobalEvent: GlobalEvent option
       Version: int64 }
 
-    interface IDefaultTag
+    interface ISerializable
 
 let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsourced<obj>) =
     let log = mailbox.UntypedContext.GetLogger()
