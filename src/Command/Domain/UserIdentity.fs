@@ -64,7 +64,7 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
                                 (v + 1L)
 
                         let identificationOutcome =
-                            toEvent ci v identityEvent |> sendToSagaStarter ci |> box |> Persist
+                            toEvent userMsg.Id ci v identityEvent |> sendToSagaStarter ci |> box |> Persist
 
                         return! identificationOutcome
                 | _ ->

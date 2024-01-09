@@ -20,6 +20,7 @@ let createCommandSubscription (domainApi: IDomain) factory (cid: CID) (id: strin
 
     let commonCommand: Command<_> =
         { CommandDetails = command
+          Id = Guid.NewGuid().ToString()
           CreationDate = domainApi.Clock.GetCurrentInstant()
           CorrelationId = corID }
 

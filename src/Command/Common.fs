@@ -32,6 +32,7 @@ type ISerializable =
 type Command<'CommandDetails> =
     { CommandDetails: 'CommandDetails
       CreationDate: Instant
+      Id : string
       CorrelationId: string }
 
     interface ISerializable
@@ -39,37 +40,16 @@ type Command<'CommandDetails> =
 type Event<'EventDetails> =
     { EventDetails: 'EventDetails
       CreationDate: Instant
+      Id : string
       CorrelationId: string
       Version: int64 }
 
     interface ISerializable
 
-let eventEncoder (detailsEncoder) (event: Event<'EventDetails>) =
-    Encode.object
-        [ "correlationid", Encode.string event.CorrelationId
-          "eventDetails", detailsEncoder event.EventDetails
-          "version", Encode.int64 event.Version ]
 
-let eventDecoder (detailsDecoder) : Decoder<Event<'EventDetails>> =
-    Decode.object (fun get ->
-        { EventDetails = get.Required.Field "eventDetails" detailsDecoder
-          Version = get.Required.Field "version" Decode.int64
-          CorrelationId = get.Required.Field "version" Decode.string
-          CreationDate = NodaTime.SystemClock.Instance.GetCurrentInstant() })
-
-let commandEncoder (detailsEncoder) (command: Command<'CommandDetails>) =
-    Encode.object
-        [ "correlationid", Encode.string command.CorrelationId
-          "commandDetails", detailsEncoder command.CommandDetails ]
-
-let commandDecoder (detailsDecoder) : Decoder<Command<'CommandDetails>> =
-    Decode.object (fun get ->
-        { CommandDetails = get.Required.Field "commandDetails" detailsDecoder
-          CorrelationId = get.Required.Field "version" Decode.string
-          CreationDate = NodaTime.SystemClock.Instance.GetCurrentInstant() })
-
-let toEvent (clockInstance: IClock) ci version event =
+let toEvent (clockInstance: IClock) id ci version event =
     { EventDetails = event
+      Id = id
       CreationDate = clockInstance.GetCurrentInstant()
       CorrelationId = ci
       Version = version }

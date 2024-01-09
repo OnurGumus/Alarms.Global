@@ -57,7 +57,7 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
                             else
                                 EventAlreadyPublished globalEvent, v
 
-                        return! toEvent ci v e |> sendToSagaStarter ci |> box |> Persist
+                        return! toEvent userMsg.Id ci v e |> sendToSagaStarter ci |> box |> Persist
                 | _ ->
                     log.Debug("Unhandled Message {@MSG}", box msg)
                     return Unhandled

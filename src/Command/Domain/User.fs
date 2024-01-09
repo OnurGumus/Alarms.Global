@@ -79,11 +79,11 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
                             else
                                 Subscribed subs, (v + 1L)
 
-                        let outcome = toEvent ci v subscribeEvent |> sendToSagaStarter ci |> box |> Persist
+                        let outcome = toEvent userMsg.Id ci v subscribeEvent |> sendToSagaStarter ci |> box |> Persist
 
                         if state.RemindBeforeDays.IsNone then
                             let event = RemindBeforeDaysSet(subs.Identity, defaultReminderDays)
-                            let e = toEvent (Guid.NewGuid().ToString()) state.Version event |> box |> Persist
+                            let e = toEvent (Guid.NewGuid().ToString()) (Guid.NewGuid().ToString()) state.Version event |> box |> Persist
                             return! outcome <@> e
                         else
                             return! outcome
@@ -94,7 +94,7 @@ let actorProp (env: _) toEvent (mediator: IActorRef<Publish>) (mailbox: Eventsou
                             else
                                 Unsubscribed subs, (v + 1L)
 
-                        let outcome = toEvent ci v subscribeEvent |> sendToSagaStarter ci |> box |> Persist
+                        let outcome = toEvent userMsg.Id ci v subscribeEvent |> sendToSagaStarter ci |> box |> Persist
                         return! outcome
 
                 | _ ->
