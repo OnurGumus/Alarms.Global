@@ -80,7 +80,7 @@ let handleEventWrapper (ctx: Sql.dataContext) (actorApi: IActor) (subQueue: ISou
                     globalEventRow.TargetDate <-
                         globalEvent.EventDateInUTC
                         |> function
-                            | Some d -> d.ToString()
+                            | Some d -> d.ToString("yyyy-MM-dd HH:mm:ss")
                             | _ -> ""
 
                     for region in globalEvent.TargetRegion do
