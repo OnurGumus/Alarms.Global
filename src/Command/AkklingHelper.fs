@@ -7,7 +7,6 @@ open Akkling
 open Akkling.Persistence
 open Akkling.Cluster.Sharding
 
-
 type Extractor<'Envelope, 'Message> = 'Envelope -> string * string * 'Message
 type ShardResolver = string -> string
 
@@ -35,6 +34,8 @@ type internal TypedMessageExtractor<'Envelope, 'Message>
                 let _, _, msg = extractor env
                 box msg
             | other -> invalidOp <| string other
+        member this.ShardId(entityId: string, messageHint: obj): string = 
+            shardResolver (entityId)
 
 
 // HACK over persistent actors
