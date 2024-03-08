@@ -23,12 +23,26 @@
             "program": "${workspaceFolder}/src/Server/bin/Debug/net8.0/Server.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/Server",
-            "console": "integratedTerminal",
+            "console": "internalConsole",
             "stopAtEntry": false,
-            "justMyCode": true,
-            "logging": {
-                "moduleLoad": false
+            "justMyCode": false, // should be false, as we want to debug 3rd party source code
+            "requireExactSource": false, 
+            "suppressJITOptimizations": true, // it's better to set true for local debugging
+            "enableStepFiltering": false, // to step into properties
+            "symbolOptions": {
+                "searchMicrosoftSymbolServer": true, // get pdb files from ms symbol server
+               // "searchNuGetOrgSymbolServer": true,
+                "moduleFilter": {
+                    "mode": "loadAllButExcluded",
+                    "excludedModules": []
+                }
+            },
+            "logging": { // you can delete it if all is ok
+                "moduleLoad": true,
+                "engineLogging": true,
+                "trace": true
             }
+
             // "symbolOptions": {
             //     "searchMicrosoftSymbolServer": true,
             //     "searchNuGetOrgSymbolServer": true
