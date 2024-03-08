@@ -8,6 +8,14 @@
             "processId": "${command:pickProcess}"
         },
         {
+            "name": "Debug Client",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:5070",
+            "webRoot": "${workspaceFolder}/src/Client/build",
+            "sourceMaps": true,
+        },
+        {
             "name": "Launch Web",
             "type": "coreclr",
             "request": "launch",
@@ -38,12 +46,31 @@
             "preLaunchTask": "Build Automation",
             "program": "${workspaceFolder}/test/Automation/bin/Debug/net8.0/Automation.dll",
             "args": [],
-            "justMyCode" : true,
+            "justMyCode" : false,
             "logging": {
                 "moduleLoad": false
             },
             "stopAtEntry": false,
-            "console": "internalConsole",
+            "console": "integratedTerminal",
+            "symbolOptions": {
+                
+                // "searchMicrosoftSymbolServer": true,
+                // "searchNuGetOrgSymbolServer": true,
+                "cachePath": "/symcache",
+                "moduleFilter": {
+                    "mode": "loadAllButExcluded",
+                }
+            },
+            "sourceLinkOptions": {
+                "https://raw.githubusercontent.com/*": { "enabled": true },
+                "*": { "enabled": true }
+            },
+        
+            "suppressJITOptimizations": true,
+            "env": {
+                "COMPlus_ZapDisable": "1",
+                "COMPlus_ReadyToRun": "0"
+            }
         },
         {
             "name": "Debug CQRS Test",

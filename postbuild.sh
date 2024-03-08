@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-npm install -g npm@10.2.5
+npm install -g npm@10.4.0
 npm ci
 dotnet tool restore
 dotnet paket install
